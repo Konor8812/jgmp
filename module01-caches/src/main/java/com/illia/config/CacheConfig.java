@@ -10,5 +10,9 @@ public class CacheConfig {
   @Value("${cache.max.size}")
   private Long maxSize;
 
+  @Value("${cache.eviction.access.time}")
+  private long evictionAccessTime;
 
+  @Value("${cache.eviction.interval}")
+  private long evictionInterval;
 }
