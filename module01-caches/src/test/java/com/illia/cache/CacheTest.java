@@ -116,42 +116,42 @@ public class CacheTest {
   }
 
   @Test
-  public void schedulerTestShouldEvictOldestAccessedEntitiesFirst() throws InterruptedException {
+  public void schedulerTestShouldEvictLeastAccessedEntitiesFirst() throws InterruptedException {
     var elementsAmount = 5L;
-    var evictionByAccessTime = 100;
 
     var config = new CacheConfig();
     config.setMaxSize(elementsAmount);
-    config.setEvictionAccessTime(evictionByAccessTime);
-    config.setEvictionInterval(evictionByAccessTime / 5);
+    mockEvictionPolicies(config);
     var cache = new PlainJavaCacheImpl<String, SimpleEntry>(config, x -> {
     });
 
-    var toBeEvictedKeys = new ArrayList<String>();
     for (int i = 0; i < elementsAmount; i++) {
-      var key = "Key " + i;
-      cache.put(key, new SimpleEntry("Value " + i));
-      toBeEvictedKeys.add(key);
+      cache.put("Key " + i, new SimpleEntry("Value " + i));
     }
-    Thread.sleep(50);
 
-    var keysToRemain = new ArrayList<String>();
-    for (long i = elementsAmount; i < elementsAmount * 2; i++) {
-      var key ="Key " + i;
-      cache.put(key, new SimpleEntry("Value " + i));
-      keysToRemain.add(key);
+    var shouldRemainKeys = new ArrayList<String>(); // should stay cashed since were accessed more times
+    for (long i = 0; i < elementsAmount - 2; i++) {
+      var key = "Key " + i;
+      cache.get(key);
+      cache.get(key);
+      shouldRemainKeys.add(key);
     }
-    Thread.sleep(50);
+
+    var shouldBeRemovedKeys = new ArrayList<String>();
+    for (long i = elementsAmount - 2; i < elementsAmount; i++) {
+      var key = "Key " + i ;
+      cache.put(key+ elementsAmount, new SimpleEntry("Value " + i + elementsAmount));
+      cache.get(key+ elementsAmount);
+      shouldBeRemovedKeys.add(key);
+    }
 
     assertEquals(elementsAmount, cache.getSize());
-    assertEquals(elementsAmount, cache.getEvictionCount());
-    for(var shouldBeEvictedKey: toBeEvictedKeys){
-      assertNull(cache.get(shouldBeEvictedKey));
-    }
-    for(var shouldRemainInCacheKey: keysToRemain){
+    for(var shouldRemainInCacheKey: shouldRemainKeys){
       assertNotNull(cache.get(shouldRemainInCacheKey));
     }
-
+    for(var shouldBeEvictedKey: shouldBeRemovedKeys){
+      assertNull(cache.get(shouldBeEvictedKey));
+    }
   }
 
   private void fillElements(Cache<String, SimpleEntry> cache, long elementsAmount) {

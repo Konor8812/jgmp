@@ -19,8 +19,7 @@ public class PlainJavaCacheImpl<K, V> implements Cache<K, V>{
   private final Consumer<K> removalListener;
   private final Map<K, V> cache = new HashMap<>();
   private final Map<K, Long> accessTimeMap = new HashMap<>();
-
-
+  private final Map<K, Long> accessesMap = new HashMap<>();
 
   private int size = 0;
   private long evictionCount = 0;
@@ -30,6 +29,7 @@ public class PlainJavaCacheImpl<K, V> implements Cache<K, V>{
   public V get(K key) {
     var value = cache.get(key);
     accessTimeMap.put(key, System.currentTimeMillis());
+    accessesMap.put(key, accessesMap.getOrDefault(key, 0L) + 1);
     return value;
   }
 
@@ -38,16 +38,17 @@ public class PlainJavaCacheImpl<K, V> implements Cache<K, V>{
     var before = System.currentTimeMillis();
     if(size >= config.getMaxSize()){
 //      evictBySize(size - config.getMaxSize() + 1);
-      evictOne();
+      evictLeastUsed();
     }
     accessTimeMap.put(key, System.currentTimeMillis());
+    accessesMap.put(key, 0L);
     ++size;
     putTimeHistory.add((short) (System.currentTimeMillis() - before));
     return cache.put(key, value);
   }
 
-  private void evictOne(){
-    var keyToDelete = accessTimeMap.entrySet().stream()
+  private void evictLeastUsed(){
+    var keyToDelete = accessesMap.entrySet().stream()
         .min(Comparator.comparingLong(Entry::getValue))
         .map(Entry::getKey);
     if(keyToDelete.isPresent()){
@@ -79,6 +80,7 @@ public class PlainJavaCacheImpl<K, V> implements Cache<K, V>{
     for(K key: keys){
       cache.remove(key);
       accessTimeMap.remove(key);
+      accessesMap.remove(key);
       removalListener.accept(key);
       ++evictionCount;
       --size;
