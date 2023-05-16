@@ -30,7 +30,7 @@ public class PlainJavaCacheImpl<K, V> implements Cache<K, V> {
   @Override
   public V get(K key) {
     var value = cache.get(key);
-    if(value != null){
+    if (value != null) {
       accessTimeMap.put(key, System.currentTimeMillis());
       accessesMap.put(key, accessesMap.getOrDefault(key, 0L) + 1);
     }
@@ -46,7 +46,7 @@ public class PlainJavaCacheImpl<K, V> implements Cache<K, V> {
     var cachedValue = cache.put(key, value);
     accessTimeMap.put(key, System.currentTimeMillis());
     accessesMap.put(key, 0L);
-    if(cachedValue == null) {
+    if (cachedValue == null) {
       size.incrementAndGet();
     }
     putTimeHistory.add((short) (System.currentTimeMillis() - before));
@@ -54,14 +54,10 @@ public class PlainJavaCacheImpl<K, V> implements Cache<K, V> {
   }
 
   private void evictLeastUsed() {
-    var keyToDelete = accessesMap.entrySet().stream()
+    accessesMap.entrySet().stream()
         .min(Comparator.comparingLong(Entry::getValue))
-        .map(Entry::getKey);
-    if (keyToDelete.isPresent()) {
-      evict(List.of(keyToDelete.get()));
-    } else {
-      evict(List.of());
-    }
+        .map(Entry::getKey)
+        .ifPresent(k -> evict(List.of(k)));
   }
 
   private void evictBySize(long numberOfElementsToEvict) {

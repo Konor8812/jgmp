@@ -3,11 +3,13 @@ package com.illia.algorithm;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 public class BinarySearchAlgorithmTest {
 
   static int[] input = new int[]{5, 11, 16, 94, 144, 253, 255, 349};
+
 
   @Test
   public void testRecursiveBinarySearchImplementationShouldReturnElementsIndex() {
@@ -37,8 +39,9 @@ public class BinarySearchAlgorithmTest {
 
   }
 
+  @Disabled // time consuming
   @Test
-  public void testRecursiveAndIterativeBinarySearchImplementationsPerformance() {
+  public void recursiveAndIterativeBinarySearchImplementationsPerformanceTest() {
     var input = new int[100000000];
     for (int i = 0; i < input.length; i++) {
       input[i] = i;
