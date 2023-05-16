@@ -79,7 +79,7 @@ public class CacheTest {
     mockEvictionPolicies(config);
     var cache = new PlainJavaCacheImpl<String, SimpleEntry>(config, x -> {
     });
-    cache.put("ExistingKey", new SimpleEntry("Value"));
+    cache.put(key, expected);
 
     assertEquals(expected, cache.get(key));
   }
@@ -129,7 +129,8 @@ public class CacheTest {
       cache.put("Key " + i, new SimpleEntry("Value " + i));
     }
 
-    var shouldRemainKeys = new ArrayList<String>(); // should stay cashed since were accessed more times
+    // should stay cashed since were accessed more times
+    var shouldRemainKeys = new ArrayList<String>();
     for (long i = 0; i < elementsAmount - 2; i++) {
       var key = "Key " + i;
       cache.get(key);
@@ -139,17 +140,17 @@ public class CacheTest {
 
     var shouldBeRemovedKeys = new ArrayList<String>();
     for (long i = elementsAmount - 2; i < elementsAmount; i++) {
-      var key = "Key " + i ;
-      cache.put(key+ elementsAmount, new SimpleEntry("Value " + i + elementsAmount));
-      cache.get(key+ elementsAmount);
+      var key = "Key " + i;
+      cache.put(key + elementsAmount, new SimpleEntry("Value " + i + elementsAmount));
+      cache.get(key + elementsAmount);
       shouldBeRemovedKeys.add(key);
     }
 
     assertEquals(elementsAmount, cache.getSize());
-    for(var shouldRemainInCacheKey: shouldRemainKeys){
+    for (var shouldRemainInCacheKey : shouldRemainKeys) {
       assertNotNull(cache.get(shouldRemainInCacheKey));
     }
-    for(var shouldBeEvictedKey: shouldBeRemovedKeys){
+    for (var shouldBeEvictedKey : shouldBeRemovedKeys) {
       assertNull(cache.get(shouldBeEvictedKey));
     }
   }

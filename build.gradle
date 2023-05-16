@@ -1,5 +1,18 @@
 plugins {
     id 'java'
+    id 'checkstyle'
+}
+
+checkstyle {
+    toolVersion '10.11.0'
+    configFile file('config/checkstyle/checkstyle.xml')
+    showViolations = true
+}
+checkstyleMain {
+    source ='src/main/java'
+}
+checkstyleTest {
+    source ='src/test/java'
 }
 
 group = 'com.illia'
@@ -10,7 +23,7 @@ repositories {
 }
 
 dependencies {
-
+//    implementation 'com.puppycrawl.tools:checkstyle:10.11.0'
 }
 
 test {

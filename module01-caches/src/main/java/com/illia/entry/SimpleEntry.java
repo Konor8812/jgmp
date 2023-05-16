@@ -1,3 +1,5 @@
 package com.illia.entry;
 
-public record SimpleEntry (String value){}
+public record SimpleEntry(String value) {
+
+}

@@ -12,6 +12,7 @@ import java.util.function.Consumer;
 
 
 public class GuavaCacheImpl<K, V> implements Cache<K, V> {
+
   private final LoadingCache<K, V> loadingCache;
 
   @Override
@@ -25,7 +26,7 @@ public class GuavaCacheImpl<K, V> implements Cache<K, V> {
     return loadingCache.getUnchecked(k);
   }
 
-  public long getSize(){
+  public long getSize() {
     return loadingCache.size();
   }
 

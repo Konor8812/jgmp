@@ -15,11 +15,12 @@ public class GuavaCacheImplTest {
   static DataProvider<String, SimpleEntry> dataProvider = new SimpleEntryProvider();
 
   @Test
-  public void testCachePutOperationShouldCacheValue(){
+  public void testCachePutOperationShouldCacheValue() {
     var config = new CacheConfig();
     mockConfig(config);
 
-    var cache = new GuavaCacheImpl<>(config, dataProvider, (x) ->{});
+    var cache = new GuavaCacheImpl<>(config, dataProvider, (x) -> {
+    });
     assertEquals(0, cache.getSize());
 
     var key = "key";
@@ -30,11 +31,12 @@ public class GuavaCacheImplTest {
   }
 
   @Test
-  public void testCachePutOperationShouldOverwriteValueForKey(){
+  public void testCachePutOperationShouldOverwriteValueForKey() {
     var config = new CacheConfig();
     mockConfig(config);
 
-    var cache = new GuavaCacheImpl<>(config, dataProvider, (x) ->{});
+    var cache = new GuavaCacheImpl<>(config, dataProvider, (x) -> {
+    });
     assertEquals(0, cache.getSize());
 
     var key = "key";
@@ -49,27 +51,29 @@ public class GuavaCacheImplTest {
 
 
   @Test
-  public void testCacheSizeShouldNotBeExceeded(){
+  public void testCacheSizeShouldNotBeExceeded() {
     var cacheSize = 10L;
     var config = new CacheConfig();
     config.setMaxSize(cacheSize);
     config.setEvictionAccessTime(Long.MAX_VALUE);
 
-    var cache = new GuavaCacheImpl<>(config, dataProvider, (x) ->{});
+    var cache = new GuavaCacheImpl<>(config, dataProvider, (x) -> {
+    });
     assertEquals(0, cache.getSize());
 
-    for(int i = 0; i < cacheSize + 2; i++) {
+    for (int i = 0; i < cacheSize + 2; i++) {
       cache.put("key " + i, dataProvider.getData("key " + i));
     }
     assertEquals(cacheSize, cache.getSize());
   }
 
   @Test
-  public void testGetOperationShouldReturnValueIfStoredOtherwiseLoad(){
+  public void testGetOperationShouldReturnValueIfStoredOtherwiseLoad() {
     var config = new CacheConfig();
     mockConfig(config);
 
-    var cache = new GuavaCacheImpl<>(config, dataProvider, (x) ->{});
+    var cache = new GuavaCacheImpl<>(config, dataProvider, (x) -> {
+    });
     assertEquals(0, cache.getSize());
 
     assertNotNull(cache.get("key"));
@@ -79,15 +83,16 @@ public class GuavaCacheImplTest {
   }
 
   @Test
-  public void testAverageLoadPenaltyShouldBePositive(){
+  public void testAverageLoadPenaltyShouldBePositive() {
     var cacheSize = 100L;
     var config = new CacheConfig();
     config.setMaxSize(cacheSize);
     config.setEvictionAccessTime(Long.MAX_VALUE);
 
-    var cache = new GuavaCacheImpl<>(config, dataProvider, (x) ->{});
+    var cache = new GuavaCacheImpl<>(config, dataProvider, (x) -> {
+    });
 
-    for(int i = 0; i < cacheSize; i++){
+    for (int i = 0; i < cacheSize; i++) {
       cache.get("key " + i);
     }
     assertTrue(cache.getAverageLoadPenalty() > 0); // '>=' might be better
@@ -101,9 +106,10 @@ public class GuavaCacheImplTest {
     config.setMaxSize(cacheSize);
     config.setEvictionAccessTime(evictionTime);
 
-    var cache = new GuavaCacheImpl<>(config, dataProvider, (x) ->{});
+    var cache = new GuavaCacheImpl<>(config, dataProvider, (x) -> {
+    });
 
-    for(int i = 0; i < cacheSize; i++){
+    for (int i = 0; i < cacheSize; i++) {
       cache.put("key " + i, dataProvider.getData("key " + i));
     }
     assertEquals(cacheSize, cache.getSize());
@@ -114,22 +120,23 @@ public class GuavaCacheImplTest {
   }
 
   @Test
-  public void testGetEvictionsCountShouldCountAllEvictions(){
+  public void testGetEvictionsCountShouldCountAllEvictions() {
     var cacheSize = 10L;
     var config = new CacheConfig();
     config.setMaxSize(cacheSize);
     config.setEvictionAccessTime(Long.MAX_VALUE);
 
-    var cache = new GuavaCacheImpl<>(config, dataProvider, (x) ->{});
+    var cache = new GuavaCacheImpl<>(config, dataProvider, (x) -> {
+    });
 
-    for(int i = 0; i < cacheSize * 2; i++){
+    for (int i = 0; i < cacheSize * 2; i++) {
       cache.put("key " + i, dataProvider.getData("key"));
     }
 
     assertEquals(cacheSize, cache.getEvictionsAmount());
   }
 
-  private void mockConfig(CacheConfig cacheConfig){
+  private void mockConfig(CacheConfig cacheConfig) {
     cacheConfig.setMaxSize(Long.MAX_VALUE);
     cacheConfig.setEvictionAccessTime(Long.MAX_VALUE);
     cacheConfig.setEvictionInterval(Long.MAX_VALUE);

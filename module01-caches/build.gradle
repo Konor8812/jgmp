@@ -1,5 +1,11 @@
 plugins {
     id 'java'
+    id 'checkstyle'
+}
+
+checkstyle {
+    configFile = rootProject.file('config/checkstyle/checkstyle.xml')
+    showViolations = true
 }
 
 group = 'com.illia'

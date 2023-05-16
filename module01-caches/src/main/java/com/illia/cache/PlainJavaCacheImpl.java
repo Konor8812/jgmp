@@ -12,7 +12,7 @@ import lombok.extern.slf4j.Slf4j;
 
 // Thread unsafe
 @Slf4j
-public class PlainJavaCacheImpl<K, V> implements Cache<K, V>{
+public class PlainJavaCacheImpl<K, V> implements Cache<K, V> {
 
   private final CacheConfig config;
 
@@ -35,9 +35,8 @@ public class PlainJavaCacheImpl<K, V> implements Cache<K, V>{
 
   @Override
   public V put(K key, V value) {
-    var before = System.currentTimeMillis();
-    if(size >= config.getMaxSize()){
-//      evictBySize(size - config.getMaxSize() + 1);
+    final var before = System.currentTimeMillis();
+    if (size >= config.getMaxSize()) {
       evictLeastUsed();
     }
     accessTimeMap.put(key, System.currentTimeMillis());
@@ -47,18 +46,18 @@ public class PlainJavaCacheImpl<K, V> implements Cache<K, V>{
     return cache.put(key, value);
   }
 
-  private void evictLeastUsed(){
+  private void evictLeastUsed() {
     var keyToDelete = accessesMap.entrySet().stream()
         .min(Comparator.comparingLong(Entry::getValue))
         .map(Entry::getKey);
-    if(keyToDelete.isPresent()){
+    if (keyToDelete.isPresent()) {
       evict(List.of(keyToDelete.get()));
-    }else {
+    } else {
       evict(List.of());
     }
   }
 
-  private void evictBySize(long numberOfElementsToEvict){
+  private void evictBySize(long numberOfElementsToEvict) {
     var keysToDelete = accessTimeMap.entrySet().stream()
         .sorted(Entry.comparingByValue())
         .limit(numberOfElementsToEvict)
@@ -67,7 +66,7 @@ public class PlainJavaCacheImpl<K, V> implements Cache<K, V>{
     evict(keysToDelete);
   }
 
-  public void evictByTime(){
+  public void evictByTime() {
     var currentTime = System.currentTimeMillis();
     var keysToDelete = accessTimeMap.entrySet().stream()
         .filter(x -> currentTime - x.getValue() > config.getEvictionAccessTime())
@@ -76,8 +75,8 @@ public class PlainJavaCacheImpl<K, V> implements Cache<K, V>{
     evict(keysToDelete);
   }
 
-  public void evict(List<K> keys){
-    for(K key: keys){
+  public void evict(List<K> keys) {
+    for (K key : keys) {
       cache.remove(key);
       accessTimeMap.remove(key);
       accessesMap.remove(key);
@@ -87,18 +86,19 @@ public class PlainJavaCacheImpl<K, V> implements Cache<K, V>{
     }
   }
 
-  public long getEvictionCount(){
+  public long getEvictionCount() {
     return evictionCount;
   }
 
-  public double getAveragePutTime(){
+  public double getAveragePutTime() {
     return putTimeHistory.stream().mapToInt(Short::intValue)
         .average().orElse(-1);
   }
 
-  public long getSize(){
+  public long getSize() {
     return size;
   }
+
   public PlainJavaCacheImpl(CacheConfig config, Consumer<K> removalListener) {
     this.config = config;
     this.removalListener = removalListener;
@@ -106,14 +106,17 @@ public class PlainJavaCacheImpl<K, V> implements Cache<K, V>{
 
   }
 
-  private class EvictionScheduler{
+  private class EvictionScheduler {
+
     private final long interval;
+
     public EvictionScheduler(long interval) {
       this.interval = interval;
     }
-    public void start(){
+
+    public void start() {
       new Thread(() -> {
-        while(true) {
+        while (true) {
           try {
             Thread.sleep(interval);
           } catch (InterruptedException ex) {
