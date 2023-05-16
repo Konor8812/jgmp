@@ -1,49 +1,56 @@
 package com.illia.cache;
 
 import com.illia.config.CacheConfig;
-import java.util.ArrayList;
 import java.util.Comparator;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Queue;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.Consumer;
 import lombok.extern.slf4j.Slf4j;
 
-// Thread unsafe
 @Slf4j
 public class PlainJavaCacheImpl<K, V> implements Cache<K, V> {
 
-  private final CacheConfig config;
-
+  private final long maxCacheSize;
+  private final long accessTimeLimit;
+  private final AtomicInteger size = new AtomicInteger(0);
+  private final AtomicLong evictionCount = new AtomicLong(0);
   private final Consumer<K> removalListener;
-  private final Map<K, V> cache = new HashMap<>();
-  private final Map<K, Long> accessTimeMap = new HashMap<>();
-  private final Map<K, Long> accessesMap = new HashMap<>();
+  private final Map<K, V> cache = new ConcurrentHashMap<>();
+  private final Map<K, Long> accessTimeMap = new ConcurrentHashMap<>();
+  private final Map<K, Long> accessesMap = new ConcurrentHashMap<>();
+  private final Queue<Short> putTimeHistory = new ConcurrentLinkedQueue<>();
 
-  private int size = 0;
-  private long evictionCount = 0;
-  private final List<Short> putTimeHistory = new ArrayList<>();
 
   @Override
   public V get(K key) {
     var value = cache.get(key);
-    accessTimeMap.put(key, System.currentTimeMillis());
-    accessesMap.put(key, accessesMap.getOrDefault(key, 0L) + 1);
+    if(value != null){
+      accessTimeMap.put(key, System.currentTimeMillis());
+      accessesMap.put(key, accessesMap.getOrDefault(key, 0L) + 1);
+    }
     return value;
   }
 
   @Override
   public V put(K key, V value) {
     final var before = System.currentTimeMillis();
-    if (size >= config.getMaxSize()) {
+    if (size.get() >= maxCacheSize) {
       evictLeastUsed();
     }
+    var cachedValue = cache.put(key, value);
     accessTimeMap.put(key, System.currentTimeMillis());
     accessesMap.put(key, 0L);
-    ++size;
+    if(cachedValue == null) {
+      size.incrementAndGet();
+    }
     putTimeHistory.add((short) (System.currentTimeMillis() - before));
-    return cache.put(key, value);
+    return cachedValue;
   }
 
   private void evictLeastUsed() {
@@ -69,7 +76,7 @@ public class PlainJavaCacheImpl<K, V> implements Cache<K, V> {
   public void evictByTime() {
     var currentTime = System.currentTimeMillis();
     var keysToDelete = accessTimeMap.entrySet().stream()
-        .filter(x -> currentTime - x.getValue() > config.getEvictionAccessTime())
+        .filter(x -> currentTime - x.getValue() > accessTimeLimit)
         .map(Entry::getKey)
         .toList();
     evict(keysToDelete);
@@ -80,14 +87,15 @@ public class PlainJavaCacheImpl<K, V> implements Cache<K, V> {
       cache.remove(key);
       accessTimeMap.remove(key);
       accessesMap.remove(key);
+
       removalListener.accept(key);
-      ++evictionCount;
-      --size;
+      evictionCount.incrementAndGet();
+      size.decrementAndGet();
     }
   }
 
   public long getEvictionCount() {
-    return evictionCount;
+    return evictionCount.get();
   }
 
   public double getAveragePutTime() {
@@ -96,11 +104,12 @@ public class PlainJavaCacheImpl<K, V> implements Cache<K, V> {
   }
 
   public long getSize() {
-    return size;
+    return size.get();
   }
 
   public PlainJavaCacheImpl(CacheConfig config, Consumer<K> removalListener) {
-    this.config = config;
+    maxCacheSize = config.getMaxSize();
+    accessTimeLimit = config.getEvictionAccessTime();
     this.removalListener = removalListener;
     new EvictionScheduler(config.getEvictionInterval()).start();
 

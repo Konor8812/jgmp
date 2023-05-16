@@ -11,7 +11,7 @@ import com.illia.entry.SimpleEntry;
 import java.util.ArrayList;
 import org.junit.jupiter.api.Test;
 
-public class CacheTest {
+public class PlainJavaCacheImplTest {
 
 
   @Test
@@ -116,7 +116,7 @@ public class CacheTest {
   }
 
   @Test
-  public void schedulerTestShouldEvictLeastAccessedEntitiesFirst() throws InterruptedException {
+  public void schedulerTestShouldEvictLeastAccessedEntitiesFirst() {
     var elementsAmount = 5L;
 
     var config = new CacheConfig();
@@ -153,6 +153,29 @@ public class CacheTest {
     for (var shouldBeEvictedKey : shouldBeRemovedKeys) {
       assertNull(cache.get(shouldBeEvictedKey));
     }
+  }
+
+  @Test
+  public void concurrentEnvironmentTestSameKeysShouldNotAppear() throws InterruptedException {
+    var elementsAmount = 5L;
+    var threadsAmount = 5;
+
+    var config = new CacheConfig();
+    config.setMaxSize(elementsAmount * threadsAmount);
+    mockEvictionPolicies(config);
+    var cache = new PlainJavaCacheImpl<String, SimpleEntry>(config, x -> {
+    });
+
+    for (int i = 0; i < threadsAmount; i++) {
+      new Thread(() -> {
+        for (int j = 0; j < elementsAmount; j++) {
+          cache.put("key " + j, new SimpleEntry("Value " + j));
+        }
+      }).start();
+    }
+    Thread.sleep(500);
+    assertEquals(elementsAmount, cache.getSize());
+
   }
 
   private void fillElements(Cache<String, SimpleEntry> cache, long elementsAmount) {
