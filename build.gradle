@@ -1,6 +1,7 @@
 plugins {
     id 'java'
     id 'checkstyle'
+    id 'jacoco'
 }
 
 checkstyle {
@@ -23,7 +24,6 @@ repositories {
 }
 
 dependencies {
-//    implementation 'com.puppycrawl.tools:checkstyle:10.11.0'
 }
 
 test {

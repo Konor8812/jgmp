@@ -9,5 +9,4 @@ public class SimpleEntryProvider implements DataProvider<String, SimpleEntry> {
     return new SimpleEntry("Value for " + key);
 
   }
-
 }
