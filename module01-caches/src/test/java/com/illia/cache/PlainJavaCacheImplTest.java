@@ -133,7 +133,7 @@ public class PlainJavaCacheImplTest {
     var shouldRemainKeys = new ArrayList<String>();
     for (long i = 0; i < elementsAmount - 2; i++) {
       var key = "Key " + i;
-      cache.get(key);
+      cache.put(key, new SimpleEntry("Value for " + key));
       cache.get(key);
       shouldRemainKeys.add(key);
     }
@@ -142,7 +142,6 @@ public class PlainJavaCacheImplTest {
     for (long i = elementsAmount - 2; i < elementsAmount; i++) {
       var key = "Key " + i;
       cache.put(key + elementsAmount, new SimpleEntry("Value " + i + elementsAmount));
-      cache.get(key + elementsAmount);
       shouldBeRemovedKeys.add(key);
     }
 

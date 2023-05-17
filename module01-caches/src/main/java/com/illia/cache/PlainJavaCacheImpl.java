@@ -1,15 +1,18 @@
 package com.illia.cache;
 
+import com.illia.cache.entity.CachedValue;
 import com.illia.config.CacheConfig;
-import java.util.Comparator;
+import java.util.Deque;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.ConcurrentLinkedDeque;
+import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
+import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.Consumer;
 import lombok.extern.slf4j.Slf4j;
 
@@ -21,72 +24,82 @@ public class PlainJavaCacheImpl<K, V> implements Cache<K, V> {
   private final AtomicInteger size = new AtomicInteger(0);
   private final AtomicLong evictionCount = new AtomicLong(0);
   private final Consumer<K> removalListener;
-  private final Map<K, V> cache = new ConcurrentHashMap<>();
-  private final Map<K, Long> accessTimeMap = new ConcurrentHashMap<>();
-  private final Map<K, Long> accessesMap = new ConcurrentHashMap<>();
-  private final Queue<Short> putTimeHistory = new ConcurrentLinkedQueue<>();
+  private final Map<K, CachedValue<V>> cache = new ConcurrentHashMap<>();
+  private final Map<Long, Deque<K>> accessesAmountMap = new ConcurrentHashMap<>();
+  private final Queue<Short> putTimeHistory = new ConcurrentLinkedDeque<>();
 
+  private final ReentrantLock lock = new ReentrantLock();
 
   @Override
   public V get(K key) {
     var value = cache.get(key);
     if (value != null) {
-      accessTimeMap.put(key, System.currentTimeMillis());
-      accessesMap.put(key, accessesMap.getOrDefault(key, 0L) + 1);
+      lock.lock();
+      value.incrementAndGetAccessesAmount();
+      value.renewLastAccessTime();
+      lock.unlock();
+      return value.getValue();
     }
-    return value;
+    return null;
   }
 
   @Override
   public V put(K key, V value) {
+    if (value == null) {
+      return null;
+    }
+
     final var before = System.currentTimeMillis();
+
+    lock.lock();
     if (size.get() >= maxCacheSize) {
       evictLeastUsed();
     }
-    var cachedValue = cache.put(key, value);
-    accessTimeMap.put(key, System.currentTimeMillis());
-    accessesMap.put(key, 0L);
+    var cachedValue = cache.put(key, new CachedValue<>(value));
+    var accessesAmount = 0L;
     if (cachedValue == null) {
+      accessesAmount = 1;
       size.incrementAndGet();
+    } else {
+      accessesAmount = cachedValue.incrementAndGetAccessesAmount();
     }
+    var neededAccessAmountDeque = accessesAmountMap.get(accessesAmount);
+    neededAccessAmountDeque.addFirst(key);
+    accessesAmountMap.put(accessesAmount, neededAccessAmountDeque);
+    lock.unlock();
+
     putTimeHistory.add((short) (System.currentTimeMillis() - before));
-    return cachedValue;
+    return value;
   }
 
   private void evictLeastUsed() {
-    accessesMap.entrySet().stream()
-        .min(Comparator.comparingLong(Entry::getValue))
-        .map(Entry::getKey)
-        .ifPresent(k -> evict(List.of(k)));
-  }
-
-  private void evictBySize(long numberOfElementsToEvict) {
-    var keysToDelete = accessTimeMap.entrySet().stream()
-        .sorted(Entry.comparingByValue())
-        .limit(numberOfElementsToEvict)
-        .map(Entry::getKey)
-        .toList();
-    evict(keysToDelete);
+    lock.lock();
+    var oldest = accessesAmountMap.get(1L).removeLast();
+    evict(List.of(oldest));
+    lock.unlock();
   }
 
   public void evictByTime() {
-    var currentTime = System.currentTimeMillis();
-    var keysToDelete = accessTimeMap.entrySet().stream()
-        .filter(x -> currentTime - x.getValue() > accessTimeLimit)
-        .map(Entry::getKey)
-        .toList();
-    evict(keysToDelete);
+    lock.lock();
+    try {
+      var keysToDelete = cache.entrySet().stream()
+          .filter(x -> x.getValue().getIdleTime() > accessTimeLimit)
+          .map(Entry::getKey)
+          .toList();
+      evict(keysToDelete);
+    } finally {
+      lock.unlock();
+    }
   }
 
   public void evict(List<K> keys) {
     for (K key : keys) {
+      lock.lock();
       cache.remove(key);
-      accessTimeMap.remove(key);
-      accessesMap.remove(key);
-
       removalListener.accept(key);
       evictionCount.incrementAndGet();
       size.decrementAndGet();
+      lock.unlock();
     }
   }
 
@@ -107,8 +120,9 @@ public class PlainJavaCacheImpl<K, V> implements Cache<K, V> {
     maxCacheSize = config.getMaxSize();
     accessTimeLimit = config.getEvictionAccessTime();
     this.removalListener = removalListener;
-    new EvictionScheduler(config.getEvictionInterval()).start();
 
+    accessesAmountMap.put(1L, new ConcurrentLinkedDeque<>());
+    new EvictionScheduler(config.getEvictionInterval()).start();
   }
 
   private class EvictionScheduler {
@@ -120,7 +134,8 @@ public class PlainJavaCacheImpl<K, V> implements Cache<K, V> {
     }
 
     public void start() {
-      new Thread(() -> {
+      var singleExecutor = Executors.newSingleThreadExecutor();
+      singleExecutor.submit(() -> {
         while (true) {
           try {
             Thread.sleep(interval);
@@ -131,7 +146,7 @@ public class PlainJavaCacheImpl<K, V> implements Cache<K, V> {
           }
           evictByTime();
         }
-      }).start();
+      });
     }
 
   }
