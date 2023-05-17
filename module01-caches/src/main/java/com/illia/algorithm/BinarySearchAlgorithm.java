@@ -22,7 +22,7 @@ public class BinarySearchAlgorithm {
 
   public static int searchIteratively(int[] input, int numberToSearch) {
 
-    for (int i = 0, j = input.length; i <= j; ) {
+    for (int i = 0, j = input.length - 1; i <= j; ) {
 
       var currentIndex = (j + i) / 2;
 
@@ -31,11 +31,9 @@ public class BinarySearchAlgorithm {
       if (currElement == numberToSearch) {
         return currentIndex;
       } else if (currElement > numberToSearch) {
-        j = currentIndex;
-        j--;
+        j = currentIndex - 1;
       } else {
-        i = currentIndex;
-        i++;
+        i = currentIndex + 1;
       }
     }
     return -1;
