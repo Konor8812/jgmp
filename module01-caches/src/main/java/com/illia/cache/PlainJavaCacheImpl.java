@@ -14,9 +14,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.Consumer;
-import lombok.extern.slf4j.Slf4j;
 
-@Slf4j
 public class PlainJavaCacheImpl<K, V> implements Cache<K, V> {
 
   private final long maxCacheSize;
@@ -32,7 +30,9 @@ public class PlainJavaCacheImpl<K, V> implements Cache<K, V> {
 
   @Override
   public V get(K key) {
+    lock.lock();
     var value = cache.get(key);
+    lock.unlock();
     if (value != null) {
       lock.lock();
       value.incrementAndGetAccessesAmount();
@@ -50,9 +50,8 @@ public class PlainJavaCacheImpl<K, V> implements Cache<K, V> {
     }
 
     final var before = System.currentTimeMillis();
-
     lock.lock();
-    if (size.get() >= maxCacheSize) {
+    if (size.get() >= maxCacheSize && !cache.containsKey(key)) {
       evictLeastUsed();
     }
     var cachedValue = cache.put(key, new CachedValue<>(value));
@@ -63,9 +62,9 @@ public class PlainJavaCacheImpl<K, V> implements Cache<K, V> {
     } else {
       accessesAmount = cachedValue.incrementAndGetAccessesAmount();
     }
-    var neededAccessAmountDeque = accessesAmountMap.get(accessesAmount);
-    neededAccessAmountDeque.addFirst(key);
-    accessesAmountMap.put(accessesAmount, neededAccessAmountDeque);
+    var correnpondingAccessAmountDeque = accessesAmountMap.get(accessesAmount);
+    correnpondingAccessAmountDeque.addFirst(key);
+    accessesAmountMap.put(accessesAmount, correnpondingAccessAmountDeque);
     lock.unlock();
 
     putTimeHistory.add((short) (System.currentTimeMillis() - before));
@@ -73,10 +72,8 @@ public class PlainJavaCacheImpl<K, V> implements Cache<K, V> {
   }
 
   private void evictLeastUsed() {
-    lock.lock();
     var oldest = accessesAmountMap.get(1L).removeLast();
     evict(List.of(oldest));
-    lock.unlock();
   }
 
   public void evictByTime() {
@@ -94,12 +91,10 @@ public class PlainJavaCacheImpl<K, V> implements Cache<K, V> {
 
   public void evict(List<K> keys) {
     for (K key : keys) {
-      lock.lock();
       cache.remove(key);
       removalListener.accept(key);
       evictionCount.incrementAndGet();
       size.decrementAndGet();
-      lock.unlock();
     }
   }
 
@@ -140,7 +135,7 @@ public class PlainJavaCacheImpl<K, V> implements Cache<K, V> {
           try {
             Thread.sleep(interval);
           } catch (InterruptedException ex) {
-            log.error("Eviction scheduler interrupted", ex);
+            ex.printStackTrace();
             Thread.currentThread().interrupt();
             break;
           }

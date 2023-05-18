@@ -9,6 +9,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import com.illia.config.CacheConfig;
 import com.illia.entry.SimpleEntry;
 import java.util.ArrayList;
+import java.util.concurrent.Executors;
 import org.junit.jupiter.api.Test;
 
 public class PlainJavaCacheImplTest {
@@ -124,27 +125,24 @@ public class PlainJavaCacheImplTest {
     mockEvictionPolicies(config);
     var cache = new PlainJavaCacheImpl<String, SimpleEntry>(config, x -> {
     });
-
-    for (int i = 0; i < elementsAmount; i++) {
-      cache.put("Key " + i, new SimpleEntry("Value " + i));
-    }
-
-    // should stay cashed since were accessed more times
     var shouldRemainKeys = new ArrayList<String>();
-    for (long i = 0; i < elementsAmount - 2; i++) {
-      var key = "Key " + i;
-      cache.put(key, new SimpleEntry("Value for " + key));
-      cache.get(key);
-      shouldRemainKeys.add(key);
-    }
-
     var shouldBeRemovedKeys = new ArrayList<String>();
-    for (long i = elementsAmount - 2; i < elementsAmount; i++) {
+    for (int i = 0; i < elementsAmount; i++) {
       var key = "Key " + i;
-      cache.put(key + elementsAmount, new SimpleEntry("Value " + i + elementsAmount));
-      shouldBeRemovedKeys.add(key);
+      cache.put(key, new SimpleEntry("Value"));
+      if (i > elementsAmount - 2) {
+        cache.get(key);
+        shouldRemainKeys.add(key);
+      } else {
+        shouldBeRemovedKeys.add(key);
+      }
     }
 
+    // to replace expected amount of keys
+    for (long i = 0; i < shouldBeRemovedKeys.size(); i++) {
+      var key = "Changed key " + i;
+      cache.put(key, new SimpleEntry("Other value"));
+    }
     assertEquals(elementsAmount, cache.getSize());
     for (var shouldRemainInCacheKey : shouldRemainKeys) {
       assertNotNull(cache.get(shouldRemainInCacheKey));
@@ -152,6 +150,36 @@ public class PlainJavaCacheImplTest {
     for (var shouldBeEvictedKey : shouldBeRemovedKeys) {
       assertNull(cache.get(shouldBeEvictedKey));
     }
+  }
+
+
+  @Test
+  public void testConcurrentAccess() throws InterruptedException {
+    long maxCacheSize = 100;
+    int threadCount = 5;
+    int operationsPerThread = 1000;
+    var config = new CacheConfig();
+    config.setMaxSize(maxCacheSize);
+    mockEvictionPolicies(config);
+
+    var cache = new PlainJavaCacheImpl<String, SimpleEntry>(config, x -> {
+    });
+
+    var executor = Executors.newFixedThreadPool(threadCount);
+    Runnable task = () -> {
+      for (int i = 0; i < operationsPerThread; i++) {
+        cache.put("key " + i, new SimpleEntry("Value " + i));
+      }
+    };
+    for (int i = 0; i < threadCount; i++) {
+      executor.execute(task);
+    }
+
+    executor.shutdown();
+    executor.awaitTermination(Long.MAX_VALUE, java.util.concurrent.TimeUnit.NANOSECONDS);
+
+    assertEquals(operationsPerThread - maxCacheSize, cache.getEvictionCount());
+    assertEquals(maxCacheSize, cache.getSize());
   }
 
   @Test
