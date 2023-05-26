@@ -9,6 +9,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import com.illia.config.CacheConfig;
 import com.illia.entry.SimpleEntry;
 import java.util.ArrayList;
+import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Executors;
 import org.junit.jupiter.api.Test;
 
@@ -166,16 +167,22 @@ public class PlainJavaCacheImplTest {
     });
 
     var executor = Executors.newFixedThreadPool(threadCount);
+    var countdownLatch = new CountDownLatch(1);
     Runnable task = () -> {
+      try {
+        countdownLatch.await();
+      } catch (InterruptedException e) {
+        throw new RuntimeException(e);
+      }
       for (int i = 0; i < operationsPerThread; i++) {
         cache.put("key " + i, new SimpleEntry("Value " + i));
       }
     };
     for (int i = 0; i < threadCount; i++) {
-      executor.execute(task);
+      executor.submit(task);
     }
-
     executor.shutdown();
+    countdownLatch.countDown();
     executor.awaitTermination(Long.MAX_VALUE, java.util.concurrent.TimeUnit.NANOSECONDS);
 
     assertEquals(operationsPerThread - maxCacheSize, cache.getEvictionCount());
