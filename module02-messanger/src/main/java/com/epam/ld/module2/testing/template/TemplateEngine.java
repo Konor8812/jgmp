@@ -1,6 +1,7 @@
 package com.epam.ld.module2.testing.template;
 
 import com.epam.ld.module2.testing.Client;
+import com.epam.ld.module2.testing.template.exception.TemplateEngineException;
 import java.util.regex.Pattern;
 
 /**
@@ -26,7 +27,14 @@ public class TemplateEngine {
    * @return the string
    */
   public String generateMessage(Template template, Client client) {
-    var modifiedGreeting = template.getGreeting()
+    var greeting = template.getGreeting();
+    var ending = template.getEnding();
+    if(!greeting.contains(recipientPlaceholderRegex)){
+      throw new TemplateEngineException("Greeting should contain recipient name placeholder!");
+    } else if (!ending.contains(senderPlaceholderRegex)) {
+      throw new TemplateEngineException("Ending should contain sender name placeholder!");
+    }
+    var modifiedGreeting = greeting
         .replaceAll(senderPlaceholderRegex, senderName)
         .replaceAll(recipientPlaceholderRegex, client.getName());
     var modifiedEnding = template.getEnding()
