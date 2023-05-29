@@ -5,12 +5,15 @@ import static com.epam.ld.module2.testing.constants.TestConstants.RECIPIENT_NAME
 import static com.epam.ld.module2.testing.constants.TestConstants.RECIPIENT_PLACEHOLDER;
 import static com.epam.ld.module2.testing.constants.TestConstants.SENDER_NAME;
 import static com.epam.ld.module2.testing.constants.TestConstants.SENDER_PLACEHOLDER;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import com.epam.ld.module2.testing.template.exception.TemplateEngineException;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
 
 public class TemplateEngineTest {
 
@@ -81,4 +84,32 @@ public class TemplateEngineTest {
     var expectedGreeting = String.format(greeting, SENDER_PLACEHOLDER);
     assertEquals(expectedGreeting, split[0]);
   }
+
+  @ParameterizedTest
+  @MethodSource("latinCharacterSet")
+  public void templateEngineTestShouldSupportFullLatinCharacterSet(Character c) { // ISO 8859-1
+    var greeting = "Dear %s";
+    var customPlaceholder = String.format("%s{%s}", c, c);
+    var customValue = String.format("%s%s", c, c);
+
+    var templateGreeting = String.format(greeting, customPlaceholder);
+    templateEngine.addPlaceholderReplacement(customPlaceholder, customValue);
+
+    var template = new Template();
+    template.setGreeting(templateGreeting);
+
+    assertDoesNotThrow(() -> {
+      templateEngine.generateMessage(template);
+    });
+  }
+
+  private static char[] latinCharacterSet(){
+    var chars = new char[256];
+    for(char c = 0; c < 256; c++){
+      chars[c] = c;
+    }
+    return chars;
+  }
+
+
 }
