@@ -5,8 +5,8 @@ package com.epam.ld.module2.testing.template;
  */
 public class Template {
 
-  private final String greeting;
-  private final String ending;
+  private String greeting;
+  private String ending;
 
   public String getGreeting() {
     return greeting;
@@ -16,8 +16,11 @@ public class Template {
     return ending;
   }
 
-  public Template(String greeting, String ending) {
+  public void setGreeting(String greeting) {
     this.greeting = greeting;
+  }
+
+  public void setEnding(String ending) {
     this.ending = ending;
   }
 }

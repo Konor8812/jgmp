@@ -1,7 +1,9 @@
 package com.epam.ld.module2.testing.template;
 
-import com.epam.ld.module2.testing.Client;
+
 import com.epam.ld.module2.testing.template.exception.TemplateEngineException;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.regex.Pattern;
 
 /**
@@ -9,40 +11,61 @@ import java.util.regex.Pattern;
  */
 public class TemplateEngine {
 
-  private final String senderName;
-  private final String senderPlaceholderRegex;
-  private final String recipientPlaceholderRegex;
+  private static final String placeholderPattern = "\\#\\{.+\\}";
+  private final Map<String, String> placeholderValueMap;
 
-  public TemplateEngine(String senderName, String senderPlaceholder, String recipientPlaceholder) {
-    this.senderName = senderName;
-    this.senderPlaceholderRegex = Pattern.quote(senderPlaceholder);
-    this.recipientPlaceholderRegex = Pattern.quote(recipientPlaceholder);
+  public TemplateEngine() {
+    placeholderValueMap = new HashMap<>();
+  }
+
+  public void addPlaceholderReplacement(String placeholder, String value) {
+    if (placeholder.matches(placeholderPattern)) {
+      placeholderValueMap.put(placeholder, value);
+    }
+    // exception
+  }
+
+  public void cleanPlaceholdersValues() {
+    for (var k : placeholderValueMap.keySet()) {
+      placeholderValueMap.remove(k);
+    }
   }
 
   /**
    * Generate message string.
    *
    * @param template the template
-   * @param client   the client
    * @return the string
    */
-  public String generateMessage(Template template, Client client) {
-    var greeting = template.getGreeting();
-    var ending = template.getEnding();
-    if(!greeting.contains(recipientPlaceholderRegex)){
-      throw new TemplateEngineException("Greeting should contain recipient name placeholder!");
-    } else if (!ending.contains(senderPlaceholderRegex)) {
-      throw new TemplateEngineException("Ending should contain sender name placeholder!");
-    }
-    var modifiedGreeting = greeting
-        .replaceAll(senderPlaceholderRegex, senderName)
-        .replaceAll(recipientPlaceholderRegex, client.getName());
-    var modifiedEnding = template.getEnding()
-        .replaceAll(senderPlaceholderRegex, senderName)
-        .replaceAll(recipientPlaceholderRegex, client.getName());
+  public String generateMessage(Template template) {
+    var modifiedGreeting = fillPlaceholders(template.getGreeting());
+    var modifiedEnding = fillPlaceholders(template.getEnding());
 
     return modifiedGreeting
         + "\n#{content}\n"
         + modifiedEnding;
+  }
+
+  private String fillPlaceholders(String s) {
+    if (s == null) {
+      return ""; // makes sense
+    }
+    assertValuesForAllPlaceholdersProvided(s);
+
+    for (var placeholder : placeholderValueMap.keySet()) {
+      s = s.replaceAll(Pattern.quote(placeholder), placeholderValueMap.get(placeholder));
+    }
+
+    return s;
+  }
+
+  private void assertValuesForAllPlaceholdersProvided(String s) {
+    var matcher = Pattern.compile(placeholderPattern).matcher(s);
+    while (matcher.find()) {
+      if (!placeholderValueMap.containsKey(matcher.group())) {
+        throw new TemplateEngineException("No value provided for one or more placeholders");
+      }
+    }
+
   }
 }
