@@ -66,4 +66,19 @@ public class TemplateEngineTest {
     assertEquals(NO_VALUE_FOR_PLACEHOLDER_EXCEPTION_MESSAGE, ex.getMessage());
   }
 
+  @Test
+  public void templateEngineTestShouldReplacePlaceholderWithAnotherPlaceholder() {
+    var greeting = "Dear %s";
+    var templateGreeting = String.format(greeting, RECIPIENT_PLACEHOLDER);
+    templateEngine.addPlaceholderReplacement(RECIPIENT_PLACEHOLDER, SENDER_PLACEHOLDER);
+
+    var template = new Template();
+    template.setGreeting(templateGreeting);
+
+    var message = templateEngine.generateMessage(template);
+    var split = message.split("\\n");
+
+    var expectedGreeting = String.format(greeting, SENDER_PLACEHOLDER);
+    assertEquals(expectedGreeting, split[0]);
+  }
 }
