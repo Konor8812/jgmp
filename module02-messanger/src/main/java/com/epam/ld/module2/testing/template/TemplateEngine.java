@@ -26,9 +26,7 @@ public class TemplateEngine {
   }
 
   public void cleanPlaceholdersValues() {
-    for (var k : placeholderValueMap.keySet()) {
-      placeholderValueMap.remove(k);
-    }
+    placeholderValueMap.clear();
   }
 
   /**
