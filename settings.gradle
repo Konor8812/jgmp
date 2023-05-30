@@ -1,4 +1,3 @@
 rootProject.name = 'jgmp'
 include 'module01-caches'
-include 'module02-messanger'
 
