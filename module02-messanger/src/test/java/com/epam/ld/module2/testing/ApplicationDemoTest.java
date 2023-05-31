@@ -2,6 +2,8 @@ package com.epam.ld.module2.testing;
 
 import static com.epam.ld.module2.testing.ApplicationMode.CONSOLE;
 import static com.epam.ld.module2.testing.ApplicationMode.FILE;
+import static com.epam.ld.module2.testing.constants.TestConstants.CLIENT_ADDRESSES;
+import static com.epam.ld.module2.testing.constants.TestConstants.MESSAGE_CONTENT;
 import static com.epam.ld.module2.testing.constants.TestConstants.SENDER_NAME;
 import static com.epam.ld.module2.testing.constants.TestConstants.SENDER_PLACEHOLDER;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -24,8 +26,11 @@ public class ApplicationDemoTest {
 
   @TempDir
   Path tempDir;
-  String inputFilename = "fileWithPlaceholders.properties";
-  String outputFilename = "output.txt";
+
+  String defaultInputName = "input.txt";
+  String inputFilename;
+  String defaultOutputName = "output.txt";
+  String outputFilename;
 
 
   @Test
@@ -80,10 +85,15 @@ public class ApplicationDemoTest {
 
   @Test
   public void consoleModeShouldReadFromFileSystem() throws IOException {
-    var data = String.format("%s%s%s%s\\\\", SENDER_PLACEHOLDER,
-        System.lineSeparator(),
+    var data = String.format("%s=%s%s\\\\%s%s%s\\\\%s%s",
+        SENDER_PLACEHOLDER,
         SENDER_NAME,
-        System.lineSeparator()).getBytes(StandardCharsets.UTF_8);
+        System.lineSeparator(),
+        System.lineSeparator(),
+        CLIENT_ADDRESSES,
+        System.lineSeparator(),
+        System.lineSeparator(),
+        MESSAGE_CONTENT).getBytes(StandardCharsets.UTF_8);
 
     prepareFiles(data);
 
@@ -96,10 +106,16 @@ public class ApplicationDemoTest {
   }
 
   private void prepareFiles(byte[] inputFileContent) throws IOException {
-    var file = tempDir.resolve(inputFilename);
-    Files.createFile(file);
-    Files.createFile(tempDir.resolve(outputFilename));
-    try (OutputStream outputStream = new FileOutputStream(file.toFile())) {
+    var inputFile = tempDir.resolve(defaultInputName);
+    inputFilename = inputFile.toString();
+    Files.createFile(inputFile);
+
+    var outputFile = tempDir.resolve(defaultOutputName);
+    inputFilename = inputFile.toString();
+    Files.createFile(outputFile);
+    outputFilename = outputFile.toString();
+
+    try (OutputStream outputStream = new FileOutputStream(inputFile.toFile())) {
       outputStream.write(inputFileContent);
       outputStream.flush();
     } catch (IOException ex) {
