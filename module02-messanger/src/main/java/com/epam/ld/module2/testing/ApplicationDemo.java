@@ -84,6 +84,9 @@ public class ApplicationDemo {
   public static ApplicationMode getApplicationMode() {
     return applicationMode;
   }
+  public static void setMessenger(Object o){ // create to avoid compile errors
+
+  }
 
   public static HashMap<String, String> getKnownPlaceholders() {
     return knownPlaceholders;

@@ -9,6 +9,10 @@ import static com.epam.ld.module2.testing.constants.TestConstants.SENDER_PLACEHO
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -84,7 +88,7 @@ public class ApplicationDemoTest {
   }
 
   @Test
-  public void consoleModeShouldReadFromFileSystem() throws IOException {
+  public void fileModeShouldReadFromFileSystem() throws IOException {
     var data = String.format("%s=%s%s\\\\%s%s%s\\\\%s%s",
         SENDER_PLACEHOLDER,
         SENDER_NAME,
@@ -103,6 +107,65 @@ public class ApplicationDemoTest {
     assertEquals(1, ApplicationDemo.getKnownPlaceholders().size());
     assertEquals(SENDER_NAME, ApplicationDemo.getKnownPlaceholders().get(SENDER_PLACEHOLDER));
 
+  }
+
+  @Test
+  public void applicationStartShouldFailIfNoMessengerProvided() {
+    ApplicationDemo.main(new String[]{inputFilename, outputFilename});
+    ApplicationDemo.start();
+    var ex = assertThrows(ApplicationException.class, ApplicationDemo::start);
+    assertEquals("No messenger provided", ex.getMessage());
+  }
+
+  @Test
+  public void consoleModeShouldCallMessengerSendMessage() throws IOException {
+    var defaultIn = System.in;
+    var defaultOut = System.out;
+
+    var data = String.format("%s%s%s%s\\\\", SENDER_PLACEHOLDER,
+        System.lineSeparator(),
+        SENDER_NAME,
+        System.lineSeparator()).getBytes(StandardCharsets.UTF_8);
+
+    try (var inputStream = new ByteArrayInputStream(data);
+        var byteOs = new ByteArrayOutputStream();
+        var printStream = new PrintStream(byteOs)) {
+      System.setIn(inputStream);
+      System.setOut(printStream);
+
+      ApplicationDemo.main(new String[]{});
+      var messenger = mock(Messenger.class);
+      ApplicationDemo.setMessenger(messenger);
+      ApplicationDemo.start();
+
+      verify(messenger, times(1)).sendMessage(any(), any());
+    } finally {
+      System.setIn(defaultIn);
+      System.setOut(defaultOut);
+    }
+
+  }
+
+  @Test
+  public void fileModeShouldCallMessengerSendMessage() throws IOException {
+    var data = String.format("%s=%s%s\\\\%s%s%s\\\\%s%s",
+        SENDER_PLACEHOLDER,
+        SENDER_NAME,
+        System.lineSeparator(),
+        System.lineSeparator(),
+        CLIENT_ADDRESSES,
+        System.lineSeparator(),
+        System.lineSeparator(),
+        MESSAGE_CONTENT).getBytes(StandardCharsets.UTF_8);
+
+    prepareFiles(data);
+
+    ApplicationDemo.main(new String[]{inputFilename, outputFilename});
+    var messenger = mock(Messenger.class);
+    ApplicationDemo.setMessenger(messenger);
+    ApplicationDemo.start();
+
+    verify(messenger, times(1)).sendMessage(any(), any());
   }
 
   private void prepareFiles(byte[] inputFileContent) throws IOException {
