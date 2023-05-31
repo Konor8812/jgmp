@@ -4,8 +4,8 @@ import static com.epam.ld.module2.testing.ApplicationMode.CONSOLE;
 import static com.epam.ld.module2.testing.ApplicationMode.FILE;
 import static com.epam.ld.module2.testing.constants.TestConstants.SENDER_NAME;
 import static com.epam.ld.module2.testing.constants.TestConstants.SENDER_PLACEHOLDER;
-import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.io.ByteArrayInputStream;
@@ -50,41 +50,40 @@ public class ApplicationDemoTest {
     var defaultIn = System.in;
     var defaultOut = System.out;
 
-    var data = String.format("""
-        %s
-        %s
-        \\""", SENDER_PLACEHOLDER, SENDER_NAME).getBytes(StandardCharsets.UTF_8);
-
-    ApplicationDemo.main(new String[]{});
-    ApplicationDemo.start();
+    var data = String.format("%s%s%s%s\\\\", SENDER_PLACEHOLDER,
+        System.lineSeparator(),
+        SENDER_NAME,
+        System.lineSeparator()).getBytes(StandardCharsets.UTF_8);
 
     try (var inputStream = new ByteArrayInputStream(data);
         var byteOs = new ByteArrayOutputStream();
         var printStream = new PrintStream(byteOs)) {
-      // Imitation of console input and output
       System.setIn(inputStream);
       System.setOut(printStream);
 
-      // ensures data was written in System.out
-      System.out.print(new String(inputStream.readAllBytes()));
-      assertArrayEquals(data, byteOs.toByteArray());
+      ApplicationDemo.main(new String[]{});
+      ApplicationDemo.start();
 
+      // most likely needs to be refactored, to many assertions
       // ensures data from imitated console input was received and parsed
       assertEquals(1, ApplicationDemo.getKnownPlaceholders().size());
       assertEquals(SENDER_NAME, ApplicationDemo.getKnownPlaceholders().get(SENDER_PLACEHOLDER));
 
+      // ensures data was written to System.out
+      assertNotEquals(0, byteOs.toByteArray().length);
     } finally {
       System.setIn(defaultIn);
       System.setOut(defaultOut);
     }
+
   }
 
   @Test
   public void consoleModeShouldReadFromFileSystem() throws IOException {
-    var data = String.format("""
-        %s
-        %s
-        \\""", SENDER_PLACEHOLDER, SENDER_NAME).getBytes(StandardCharsets.UTF_8);
+    var data = String.format("%s%s%s%s\\\\", SENDER_PLACEHOLDER,
+        System.lineSeparator(),
+        SENDER_NAME,
+        System.lineSeparator()).getBytes(StandardCharsets.UTF_8);
 
     prepareFiles(data);
 
@@ -95,8 +94,6 @@ public class ApplicationDemoTest {
     assertEquals(SENDER_NAME, ApplicationDemo.getKnownPlaceholders().get(SENDER_PLACEHOLDER));
 
   }
-
-
 
   private void prepareFiles(byte[] inputFileContent) throws IOException {
     var file = tempDir.resolve(inputFilename);
