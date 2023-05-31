@@ -8,13 +8,20 @@ import static com.epam.ld.module2.testing.constants.TestConstants.SENDER_PLACEHO
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.fail;
 
+import com.epam.ld.module2.testing.extension.CustomFilterExtension;
+import com.epam.ld.module2.testing.extension.meta.FastTest;
 import com.epam.ld.module2.testing.template.exception.TemplateEngineException;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.condition.DisabledOnOs;
+import org.junit.jupiter.api.condition.OS;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 
+@ExtendWith(CustomFilterExtension.class)
 public class TemplateEngineTest {
 
   TemplateEngine templateEngine = new TemplateEngine();
@@ -103,9 +110,16 @@ public class TemplateEngineTest {
     });
   }
 
-  private static char[] latinCharacterSet(){
+  // functionality demonstration purpose
+  @DisabledOnOs(OS.LINUX)
+  @FastTest
+  public void thisTestShouldBeIgnored() {
+    fail();
+  }
+
+  private static char[] latinCharacterSet() {
     var chars = new char[256];
-    for(char c = 0; c < 256; c++){
+    for (char c = 0; c < 256; c++) {
       chars[c] = c;
     }
     return chars;

@@ -10,10 +10,16 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
+import com.epam.ld.module2.testing.extension.LoggingExtension;
+import com.epam.ld.module2.testing.template.Template;
+import com.epam.ld.module2.testing.template.TemplateEngine;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.FileOutputStream;
@@ -25,8 +31,10 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.api.io.TempDir;
 
+@ExtendWith(LoggingExtension.class)
 public class ApplicationDemoTest {
 
   @TempDir
@@ -136,11 +144,18 @@ public class ApplicationDemoTest {
       System.setOut(printStream);
 
       ApplicationDemo.main(new String[]{});
-      var messenger = mock(Messenger.class);
+      var mailServer = mock(MailServer.class);
+
+      var templateEngine = mock(TemplateEngine.class);
+      when(templateEngine.generateMessage(any(Template.class)))
+          .thenReturn("generatedMessage");
+      var messenger = new Messenger(mailServer, templateEngine);
+
       ApplicationDemo.setMessenger(messenger);
       ApplicationDemo.start();
 
-      verify(messenger, times(1)).sendMessage(any(), any());
+      verify(mailServer, times(1))
+          .send(any(), eq("generatedMessage"));
     } finally {
       System.setIn(defaultIn);
       System.setOut(defaultOut);
@@ -163,10 +178,19 @@ public class ApplicationDemoTest {
     prepareFiles(data);
 
     ApplicationDemo.main(new String[]{inputFilename, outputFilename});
-    var messenger = mock(Messenger.class);
+
+    var mailServer = spy(MailServer.class);
+    var templateEngine = mock(TemplateEngine.class);
+    when(templateEngine.generateMessage(any()))
+        .thenReturn("generatedMessage");
+
+    var messenger = spy(new Messenger(mailServer, templateEngine));
+
     ApplicationDemo.setMessenger(messenger);
     ApplicationDemo.start();
 
+    verify(templateEngine, times(1)).generateMessage(any());
+    verify(mailServer, times(1)).send(any(), eq("generatedMessage"));
     verify(messenger, times(1)).sendMessage(any(), any());
   }
 
@@ -176,7 +200,6 @@ public class ApplicationDemoTest {
     Files.createFile(inputFile);
 
     var outputFile = tempDir.resolve(defaultOutputName);
-    inputFilename = inputFile.toString();
     Files.createFile(outputFile);
     outputFilename = outputFile.toString();
 
@@ -189,7 +212,7 @@ public class ApplicationDemoTest {
   }
 
   @AfterEach
-  public void cleanContext(){
+  public void cleanContext() {
     ApplicationDemo.setApplicationMode(null);
     ApplicationDemo.setArgs(null);
     ApplicationDemo.setMessenger(null);

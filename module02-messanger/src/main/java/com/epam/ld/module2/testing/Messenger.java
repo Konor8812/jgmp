@@ -31,6 +31,7 @@ public class Messenger {
      */
     public void sendMessage(Client client, Template template) {
         String messageContent = templateEngine.generateMessage(template);
+
         mailServer.send(client.getAddresses(), messageContent);
     }
 }

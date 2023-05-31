@@ -1,7 +1,6 @@
 package com.epam.ld.module2.testing;
 
 import com.epam.ld.module2.testing.template.Template;
-import com.epam.ld.module2.testing.template.TemplateEngine;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.FileWriter;
@@ -41,7 +40,6 @@ public class ApplicationDemo {
   }
 
   private static void startInConsoleMode() {
-    var messenger = new Messenger(new MailServer(), new TemplateEngine());
     try (var reader = new BufferedReader(new InputStreamReader(System.in));
         var writer = System.out) {
       writer.println("Enter placeholders, double backslash \"\\\\\" to end");
@@ -79,6 +77,21 @@ public class ApplicationDemo {
         }
       }
 
+      var client = new Client();
+      var addressBuilder = new StringBuilder();
+      while (!(line = reader.readLine()).equals("\\\\")) {
+        addressBuilder.append(line).append(System.lineSeparator());
+      }
+      client.setAddresses(addressBuilder.toString());
+
+      var template = new Template();
+      var messageBuilder = new StringBuilder();
+      while ((line = reader.readLine()) != null) {
+        messageBuilder.append(line).append(System.lineSeparator());
+      }
+      template.setGreeting(messageBuilder.toString());
+
+      messenger.sendMessage(client, template);
     } catch (IOException ex) {
       ex.printStackTrace();
     }
