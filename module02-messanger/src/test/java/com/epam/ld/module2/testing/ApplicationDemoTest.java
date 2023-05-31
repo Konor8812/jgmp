@@ -23,6 +23,7 @@ import java.io.PrintStream;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
@@ -71,6 +72,7 @@ public class ApplicationDemoTest {
       System.setOut(printStream);
 
       ApplicationDemo.main(new String[]{});
+      ApplicationDemo.setMessenger(mock(Messenger.class));
       ApplicationDemo.start();
 
       // most likely needs to be refactored, to many assertions
@@ -102,6 +104,7 @@ public class ApplicationDemoTest {
     prepareFiles(data);
 
     ApplicationDemo.main(new String[]{inputFilename, outputFilename});
+    ApplicationDemo.setMessenger(mock(Messenger.class));
     ApplicationDemo.start();
 
     assertEquals(1, ApplicationDemo.getKnownPlaceholders().size());
@@ -112,7 +115,6 @@ public class ApplicationDemoTest {
   @Test
   public void applicationStartShouldFailIfNoMessengerProvided() {
     ApplicationDemo.main(new String[]{inputFilename, outputFilename});
-    ApplicationDemo.start();
     var ex = assertThrows(ApplicationException.class, ApplicationDemo::start);
     assertEquals("No messenger provided", ex.getMessage());
   }
@@ -184,6 +186,13 @@ public class ApplicationDemoTest {
     } catch (IOException ex) {
       ex.printStackTrace();
     }
+  }
+
+  @AfterEach
+  public void cleanContext(){
+    ApplicationDemo.setApplicationMode(null);
+    ApplicationDemo.setArgs(null);
+    ApplicationDemo.setMessenger(null);
   }
 
 }

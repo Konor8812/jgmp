@@ -14,6 +14,7 @@ import java.util.regex.Pattern;
 public class ApplicationDemo {
 
   private static ApplicationMode applicationMode;
+  private static Messenger messenger;
   private static String[] args;
   private static final HashMap<String, String> knownPlaceholders = new HashMap<>();
 
@@ -29,6 +30,9 @@ public class ApplicationDemo {
   }
 
   public static void start() {
+    if (messenger == null) {
+      throw new ApplicationException("No messenger provided");
+    }
     switch (applicationMode) {
       case CONSOLE -> startInConsoleMode();
       case FILE -> startInFileMode();
@@ -81,11 +85,20 @@ public class ApplicationDemo {
 
   }
 
+  public static void setApplicationMode(ApplicationMode applicationMode) {
+    ApplicationDemo.applicationMode = applicationMode;
+  }
+
+  public static void setArgs(String[] args) {
+    ApplicationDemo.args = args;
+  }
+
   public static ApplicationMode getApplicationMode() {
     return applicationMode;
   }
-  public static void setMessenger(Object o){ // create to avoid compile errors
 
+  public static void setMessenger(Messenger messenger) {
+    ApplicationDemo.messenger = messenger;
   }
 
   public static HashMap<String, String> getKnownPlaceholders() {
