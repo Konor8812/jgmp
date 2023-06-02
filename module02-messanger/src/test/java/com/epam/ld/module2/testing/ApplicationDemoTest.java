@@ -80,13 +80,13 @@ public class ApplicationDemoTest {
       System.setOut(printStream);
 
       ApplicationDemo.main(new String[]{});
-      ApplicationDemo.setMessenger(mock(Messenger.class));
-      ApplicationDemo.start();
+      ApplicationDemo.start(mock(Messenger.class));
 
       // most likely needs to be refactored, to many assertions
       // ensures data from imitated console input was received and parsed
-      assertEquals(1, ApplicationDemo.getKnownPlaceholders().size());
-      assertEquals(SENDER_NAME, ApplicationDemo.getKnownPlaceholders().get(SENDER_PLACEHOLDER));
+      assertEquals(1, ApplicationDemo.getCommand().getKnownPlaceholders().size());
+      assertEquals(SENDER_NAME,
+          ApplicationDemo.getCommand().getKnownPlaceholders().get(SENDER_PLACEHOLDER));
 
       // ensures data was written to System.out
       assertNotEquals(0, byteOs.toByteArray().length);
@@ -112,18 +112,18 @@ public class ApplicationDemoTest {
     prepareFiles(data);
 
     ApplicationDemo.main(new String[]{inputFilename, outputFilename});
-    ApplicationDemo.setMessenger(mock(Messenger.class));
-    ApplicationDemo.start();
+    ApplicationDemo.start(mock(Messenger.class));
 
-    assertEquals(1, ApplicationDemo.getKnownPlaceholders().size());
-    assertEquals(SENDER_NAME, ApplicationDemo.getKnownPlaceholders().get(SENDER_PLACEHOLDER));
+    assertEquals(1, ApplicationDemo.getCommand().getKnownPlaceholders().size());
+    assertEquals(SENDER_NAME,
+        ApplicationDemo.getCommand().getKnownPlaceholders().get(SENDER_PLACEHOLDER));
 
   }
 
   @Test
   public void applicationStartShouldFailIfNoMessengerProvided() {
     ApplicationDemo.main(new String[]{inputFilename, outputFilename});
-    var ex = assertThrows(ApplicationException.class, ApplicationDemo::start);
+    var ex = assertThrows(ApplicationException.class, () -> ApplicationDemo.start(null));
     assertEquals("No messenger provided", ex.getMessage());
   }
 
@@ -151,8 +151,7 @@ public class ApplicationDemoTest {
           .thenReturn("generatedMessage");
       var messenger = new Messenger(mailServer, templateEngine);
 
-      ApplicationDemo.setMessenger(messenger);
-      ApplicationDemo.start();
+      ApplicationDemo.start(messenger);
 
       verify(mailServer, times(1))
           .send(any(), eq("generatedMessage"));
@@ -185,9 +184,7 @@ public class ApplicationDemoTest {
         .thenReturn("generatedMessage");
 
     var messenger = spy(new Messenger(mailServer, templateEngine));
-
-    ApplicationDemo.setMessenger(messenger);
-    ApplicationDemo.start();
+    ApplicationDemo.start(messenger);
 
     verify(templateEngine, times(1)).generateMessage(any());
     verify(mailServer, times(1)).send(any(), eq("generatedMessage"));
@@ -215,7 +212,6 @@ public class ApplicationDemoTest {
   public void cleanContext() {
     ApplicationDemo.setApplicationMode(null);
     ApplicationDemo.setArgs(null);
-    ApplicationDemo.setMessenger(null);
   }
 
 }

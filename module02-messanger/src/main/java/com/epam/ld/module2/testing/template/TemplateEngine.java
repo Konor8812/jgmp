@@ -4,6 +4,7 @@ package com.epam.ld.module2.testing.template;
 import com.epam.ld.module2.testing.template.exception.TemplateEngineException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
@@ -11,7 +12,7 @@ import java.util.regex.Pattern;
  */
 public class TemplateEngine {
 
-  private static final String placeholderPattern = "\\#\\{.+\\}";
+  private static final String placeholderPattern = "\\#\\{[\\x00-\\xFF]+\\}";
   private final Map<String, String> placeholderValueMap;
 
   public TemplateEngine() {
@@ -21,8 +22,9 @@ public class TemplateEngine {
   public void addPlaceholderReplacement(String placeholder, String value) {
     if (placeholder.matches(placeholderPattern)) {
       placeholderValueMap.put(placeholder, value);
+    } else {
+      throw new TemplateEngineException("no for " + placeholder + "   value   " + value);
     }
-    // exception
   }
 
   public void cleanPlaceholdersValues() {
@@ -44,21 +46,24 @@ public class TemplateEngine {
         + modifiedEnding;
   }
 
-  private String fillPlaceholders(String s) {
-    if (s == null) {
+  private String fillPlaceholders(String stringWithPlaceholders) {
+    if (stringWithPlaceholders == null) {
       return ""; // makes sense
     }
-    assertValuesForAllPlaceholdersProvided(s);
+    ensureValuesForAllPlaceholdersProvided(stringWithPlaceholders);
 
+    String response = stringWithPlaceholders;
     for (var placeholder : placeholderValueMap.keySet()) {
-      s = s.replaceAll(Pattern.quote(placeholder), placeholderValueMap.get(placeholder));
+      var escapedSpecialChars = Matcher.quoteReplacement(placeholder);
+      response = stringWithPlaceholders.replaceAll(Pattern.quote(escapedSpecialChars),
+          placeholderValueMap.get(placeholder));
     }
 
-    return s;
+    return response;
   }
 
-  private void assertValuesForAllPlaceholdersProvided(String s) {
-    var matcher = Pattern.compile(placeholderPattern).matcher(s);
+  private void ensureValuesForAllPlaceholdersProvided(String stringWithPlaceholders) {
+    var matcher = Pattern.compile(placeholderPattern).matcher(stringWithPlaceholders);
     while (matcher.find()) {
       if (!placeholderValueMap.containsKey(matcher.group())) {
         throw new TemplateEngineException("No value provided for one or more placeholders");

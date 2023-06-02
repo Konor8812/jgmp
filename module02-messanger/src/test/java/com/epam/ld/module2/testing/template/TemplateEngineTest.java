@@ -96,7 +96,7 @@ public class TemplateEngineTest {
   @MethodSource("latinCharacterSet")
   public void templateEngineTestShouldSupportFullLatinCharacterSet(Character c) { // ISO 8859-1
     var greeting = "Dear %s";
-    var customPlaceholder = String.format("%s{%s}", c, c);
+    var customPlaceholder = String.format("#{%s}", c, c);
     var customValue = String.format("%s%s", c, c);
 
     var templateGreeting = String.format(greeting, customPlaceholder);
