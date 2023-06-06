@@ -1,0 +1,2 @@
+Test failed applicationShouldStartInFileModeTwoArgsPassed()  `failed on purpose`
+Test failed fileModeShouldCallMessengerSendMessage()
