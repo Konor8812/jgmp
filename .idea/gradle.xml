@@ -11,6 +11,7 @@
             <option value="$PROJECT_DIR$" />
             <option value="$PROJECT_DIR$/module01-caches" />
             <option value="$PROJECT_DIR$/module02-messanger" />
+            <option value="$PROJECT_DIR$/module03-chatgpt" />
           </set>
         </option>
       </GradleProjectSettings>
