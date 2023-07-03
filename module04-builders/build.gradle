@@ -1,0 +1,76 @@
+plugins {
+    id 'java'
+    id 'war'
+}
+
+group = 'com.illia'
+version = '1.0-SNAPSHOT'
+
+sourceSets {
+    main {
+        java {
+            srcDirs('utils/src/main/java', 'services/src/main/java', 'admin/src/main/java', 'web/src/main/java')
+        }
+        resources {
+            srcDirs('utils/src/main/resources', 'services/src/main/resources', 'admin/src/main/resources', 'web/src/main/resources')
+        }
+    }
+    test {
+        java {
+            srcDirs('utils/src/test/java', 'services/src/test/java', 'admin/src/test/java', 'web/src/test/java')
+        }
+        resources {
+            srcDirs('utils/src/test/resources', 'services/src/test/resources', 'admin/src/test/resources', 'web/src/test/resources')
+        }
+    }
+}
+
+repositories {
+    mavenCentral()
+}
+
+processResources{
+    from sourceSets.main.resources
+    destinationDir = file('build/resources/main')
+}
+
+processTestResources{
+    from sourceSets.test.resources
+    destinationDir = file('build/resources/test')
+}
+
+compileJava{
+    source = sourceSets.main.java
+    destinationDir = file('build/classes/java/main')
+    classpath = sourceSets.main.compileClasspath
+}
+
+compileTestJava{
+    source = sourceSets.test.java
+    destinationDir = file('build/classes/java/test')
+    classpath = sourceSets.test.compileClasspath
+}
+
+jar {
+    dependsOn(test)
+    archiveFileName = 'app.jar'
+    manifest {
+        attributes 'Main-Class': 'com.builders.admin.AdminEntryPoint'
+    }
+    exclude('**/web*/**')
+    destinationDirectory = file('build/artifact')
+}
+
+dependencies {
+    testImplementation 'junit:junit:4.13.2'
+    providedCompile 'javax.servlet:javax.servlet-api:4.0.1'
+}
+
+war {
+    archiveFileName = 'webapp.war'
+    webXml = file('web/src/main/webapp/WEB-INF/web.xml')
+    from('web/src/main/webapp') {
+        include '**/*.jsp'
+    }
+    destinationDirectory = file('build/artifact')
+}
