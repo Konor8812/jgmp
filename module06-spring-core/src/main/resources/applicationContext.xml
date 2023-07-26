@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+  <!-- Define the UserService bean -->
+  <bean id="userService" class="com.illia.service.impl.UserServiceImpl" />
+  <bean id="ticketService" class="com.illia.service.impl.TicketServiceImpl" />
+  <bean id="eventService" class="com.illia.service.impl.EventServiceImpl" />
+
+  <bean id="bookingFacade" class="com.illia.facade.BookingFacadeImpl" >
+    <constructor-arg name="userService" ref="userService"/>
+    <constructor-arg name="eventService" ref="eventService"/>
+    <constructor-arg name="ticketService" ref="ticketService"/>
+  </bean>
+
+</beans>

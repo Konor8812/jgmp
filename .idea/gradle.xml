@@ -13,6 +13,7 @@
             <option value="$PROJECT_DIR$/module02-messanger" />
             <option value="$PROJECT_DIR$/module03-chatgpt" />
             <option value="$PROJECT_DIR$/module04-builders" />
+            <option value="$PROJECT_DIR$/module06-spring-core" />
           </set>
         </option>
       </GradleProjectSettings>
