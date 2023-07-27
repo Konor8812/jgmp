@@ -4,18 +4,25 @@ import com.illia.data.DataStorage;
 import com.illia.model.Event;
 import java.util.List;
 import java.util.stream.Collectors;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class EventDAO {
 
+  private final Logger logger = LoggerFactory.getLogger(EventDAO.class);
   private DataStorage dataStorage;
-  private static final String NAMESPACE = "ticket:";
+  private static final String NAMESPACE = "event:";
 
   public void setDataStorage(DataStorage dataStorage) {
     this.dataStorage = dataStorage;
   }
 
   public Event saveEvent(Event event) {
-    return (Event)dataStorage.save(NAMESPACE + event.getId(), event);
+    logger.debug(String.format("Saving event with id=%s title=%s date=%s",
+        event.getId(),
+        event.getTitle(),
+        event.getDate()));
+    return (Event) dataStorage.save(NAMESPACE + event.getId(), event);
   }
 
   public Event getEventById(long id) {

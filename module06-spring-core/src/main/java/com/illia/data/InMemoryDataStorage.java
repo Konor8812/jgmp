@@ -20,7 +20,7 @@ import org.springframework.core.io.ClassPathResource;
 
 public class InMemoryDataStorage implements DataStorage {
 
-  private final Map<String, Object> storage;
+  private Map<String, Object> storage;
 
   public InMemoryDataStorage() {
     storage = new HashMap<>();
@@ -52,6 +52,11 @@ public class InMemoryDataStorage implements DataStorage {
         .filter(x -> x.getKey().contains(namespace))
         .map(Entry::getValue)
         .collect(Collectors.toList());
+  }
+
+  @Override
+  public void clean() {
+    storage = new HashMap<>();
   }
 
   String filePath;

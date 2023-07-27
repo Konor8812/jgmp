@@ -1,13 +1,13 @@
 package com.illia.service.impl;
 
 import com.illia.dao.UserDAO;
-import com.illia.data.DataStorage;
 import com.illia.model.User;
 import com.illia.service.UserService;
 import java.util.List;
 import java.util.stream.Collectors;
 
 public class UserServiceImpl implements UserService {
+
   private UserDAO userDAO;
 
   public void setUserDAO(UserDAO userDAO) {

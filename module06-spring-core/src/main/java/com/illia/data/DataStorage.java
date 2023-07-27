@@ -1,7 +1,6 @@
 package com.illia.data;
 
 import java.util.List;
-import java.util.Map;
 
 public interface DataStorage {
 
@@ -14,4 +13,6 @@ public interface DataStorage {
   Object delete(String key);
 
   List<Object> getAll(String namespace);
+
+  void clean();
 }

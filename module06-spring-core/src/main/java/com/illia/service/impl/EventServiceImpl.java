@@ -1,7 +1,6 @@
 package com.illia.service.impl;
 
 import com.illia.dao.EventDAO;
-import com.illia.data.DataStorage;
 import com.illia.model.Event;
 import com.illia.service.EventService;
 import java.util.Date;
@@ -10,7 +9,7 @@ import java.util.stream.Collectors;
 
 public class EventServiceImpl implements EventService {
 
-private EventDAO eventDAO;
+  private EventDAO eventDAO;
 
   public void setEventDAO(EventDAO eventDAO) {
     this.eventDAO = eventDAO;

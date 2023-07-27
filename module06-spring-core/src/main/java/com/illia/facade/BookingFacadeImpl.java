@@ -7,14 +7,12 @@ import com.illia.model.User;
 import com.illia.service.EventService;
 import com.illia.service.TicketService;
 import com.illia.service.UserService;
-import com.illia.service.impl.EventServiceImpl;
-import com.illia.service.impl.TicketServiceImpl;
-import com.illia.service.impl.UserServiceImpl;
 import java.util.Date;
 import java.util.List;
+import java.util.stream.Collectors;
 
 
-public class BookingFacadeImpl implements BookingFacade{
+public class BookingFacadeImpl implements BookingFacade {
 
   private final UserService userService;
   private final TicketService ticketService;
@@ -35,14 +33,18 @@ public class BookingFacadeImpl implements BookingFacade{
 
   @Override
   public List<Event> getEventsByTitle(String title, int pageSize, int pageNum) {
-    var events = eventService.getEventByTitle(title);
-    return events;
+    return eventService.getEventByTitle(title).stream()
+        .skip((long) pageNum * pageSize)
+        .limit(pageSize)
+        .collect(Collectors.toList());
   }
 
   @Override
   public List<Event> getEventsForDay(Date day, int pageSize, int pageNum) {
-    var events = eventService.getEventsForDay(day);
-    return events;
+    return eventService.getEventsForDay(day).stream()
+        .skip((long) pageNum * pageSize)
+        .limit(pageSize)
+        .collect(Collectors.toList());
   }
 
   @Override
@@ -72,8 +74,10 @@ public class BookingFacadeImpl implements BookingFacade{
 
   @Override
   public List<User> getUsersByName(String name, int pageSize, int pageNum) {
-    var users = userService.getUsersByName(name);
-    return users;
+    return userService.getUsersByName(name).stream()
+        .skip((long) pageNum * pageSize)
+        .limit(pageSize)
+        .collect(Collectors.toList());
   }
 
   @Override
@@ -93,11 +97,11 @@ public class BookingFacadeImpl implements BookingFacade{
 
   @Override
   public Ticket bookTicket(long userId, long eventId, int place, Category category) {
-    var ticket = new Ticket(){
-
+    var id = ticketService.getLastBookedTicketNumber();
+    var ticket = new Ticket() {
       @Override
       public long getId() {
-        return 0;
+        return id;
       }
 
       @Override
@@ -107,7 +111,7 @@ public class BookingFacadeImpl implements BookingFacade{
 
       @Override
       public long getEventId() {
-        return 0;
+        return eventId;
       }
 
       @Override
@@ -117,7 +121,7 @@ public class BookingFacadeImpl implements BookingFacade{
 
       @Override
       public long getUserId() {
-        return 0;
+        return userId;
       }
 
       @Override
@@ -127,7 +131,7 @@ public class BookingFacadeImpl implements BookingFacade{
 
       @Override
       public Category getCategory() {
-        return null;
+        return category;
       }
 
       @Override
@@ -137,7 +141,7 @@ public class BookingFacadeImpl implements BookingFacade{
 
       @Override
       public int getPlace() {
-        return 0;
+        return place;
       }
 
       @Override
@@ -150,14 +154,18 @@ public class BookingFacadeImpl implements BookingFacade{
 
   @Override
   public List<Ticket> getBookedTickets(User user, int pageSize, int pageNum) {
-    var tickets = ticketService.getBookedTicketsByUser(user);
-    return tickets;
+    return ticketService.getBookedTicketsByUser(user).stream()
+        .skip((long) pageNum * pageSize)
+        .limit(pageSize)
+        .collect(Collectors.toList());
   }
 
   @Override
   public List<Ticket> getBookedTickets(Event event, int pageSize, int pageNum) {
-    var tickets = ticketService.getBookedTicketsByEvent(event);
-    return null;
+    return ticketService.getBookedTicketsByEvent(event).stream()
+        .skip((long) pageNum * pageSize)
+        .limit(pageSize)
+        .collect(Collectors.toList());
   }
 
   @Override

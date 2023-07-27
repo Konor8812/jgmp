@@ -5,9 +5,12 @@ import com.illia.data.DataStorage;
 import com.illia.model.User;
 import java.util.List;
 import java.util.stream.Collectors;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class UserDAO {
 
+  private final Logger logger = LoggerFactory.getLogger(TicketDAO.class);
   private DataStorage dataStorage;
   private static final String NAMESPACE = "user:";
 
@@ -16,6 +19,10 @@ public class UserDAO {
   }
 
   public User saveUser(User user) {
+    logger.debug(String.format("Saving user with id=%s name=%s email=%s",
+        user.getId(),
+        user.getName(),
+        user.getEmail()));
     return (User) dataStorage.save(NAMESPACE + user.getId(), user);
   }
 

@@ -4,16 +4,26 @@ import com.illia.data.DataStorage;
 import com.illia.model.Ticket;
 import java.util.List;
 import java.util.stream.Collectors;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class TicketDAO {
 
+  private final Logger logger = LoggerFactory.getLogger(TicketDAO.class);
   private DataStorage dataStorage;
   private static final String NAMESPACE = "ticket:";
 
   public void setDataStorage(DataStorage dataStorage) {
     this.dataStorage = dataStorage;
   }
+
   public Ticket saveTicket(Ticket ticket) {
+    logger.debug(String.format("Saving ticket with id=%s userId=%s eventId=%s place=%s category=%s",
+        ticket.getId(),
+        ticket.getUserId(),
+        ticket.getEventId(),
+        ticket.getPlace(),
+        ticket.getCategory()));
     return (Ticket) dataStorage.save(NAMESPACE + ticket.getId(), ticket);
   }
 

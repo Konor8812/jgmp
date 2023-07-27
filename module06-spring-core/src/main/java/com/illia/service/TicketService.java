@@ -14,4 +14,7 @@ public interface TicketService {
   List<Ticket> getBookedTicketsByUser(User user);
 
   Ticket bookTicket(Ticket ticket);
+
+  long getLastBookedTicketNumber();
+
 }
