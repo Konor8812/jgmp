@@ -1,17 +1,44 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <beans xmlns="http://www.springframework.org/schema/beans"
   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+  xmlns:context="http://www.springframework.org/schema/context"
+  xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans.xsd
+           http://www.springframework.org/schema/context
+           http://www.springframework.org/schema/context/spring-context.xsd">
 
-  <!-- Define the UserService bean -->
-  <bean id="userService" class="com.illia.service.impl.UserServiceImpl" />
-  <bean id="ticketService" class="com.illia.service.impl.TicketServiceImpl" />
-  <bean id="eventService" class="com.illia.service.impl.EventServiceImpl" />
+  <context:property-placeholder location="classpath:application.properties" />
+  <bean id="dataStorage" class="com.illia.data.InMemoryDataStorage" init-method="postConstruct">
+    <property name="filePath" value="${data.file.path}"/>
+  </bean>
+
+  <bean id="userDAO" class="com.illia.dao.UserDAO" >
+    <property name="dataStorage" ref="dataStorage"/>
+  </bean>
+
+  <bean id="eventDAO" class="com.illia.dao.EventDAO" >
+    <property name="dataStorage" ref="dataStorage"/>
+  </bean>
+  <bean id="ticketDAO" class="com.illia.dao.TicketDAO" >
+    <property name="dataStorage" ref="dataStorage"/>
+  </bean>
+
+  <bean id="userService" class="com.illia.service.impl.UserServiceImpl" >
+    <property name="userDAO"   ref="userDAO"/>
+  </bean>
+  <bean id="ticketService" class="com.illia.service.impl.TicketServiceImpl" >
+    <property name="ticketDAO" ref="ticketDAO"/>
+  </bean>
+  <bean id="eventService" class="com.illia.service.impl.EventServiceImpl" >
+    <property name="eventDAO" ref="eventDAO"/>
+  </bean>
 
   <bean id="bookingFacade" class="com.illia.facade.BookingFacadeImpl" >
     <constructor-arg name="userService" ref="userService"/>
     <constructor-arg name="eventService" ref="eventService"/>
     <constructor-arg name="ticketService" ref="ticketService"/>
   </bean>
+
+
 
 </beans>
