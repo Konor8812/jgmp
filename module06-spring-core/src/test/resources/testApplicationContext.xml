@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <beans xmlns="http://www.springframework.org/schema/beans"
+  xmlns:p="http://www.springframework.org/schema/p"
   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xmlns:context="http://www.springframework.org/schema/context"
   xsi:schemaLocation="http://www.springframework.org/schema/beans
@@ -10,9 +11,7 @@
 
   <bean class="com.illia.config.CustomBeanPostProcessor" />
 
-  <bean id="dataStorage" class="com.illia.data.InMemoryDataStorage" >
-    <property name="filePath" value="${data.file.path}"/>
-  </bean>
+  <bean id="dataStorage" class="com.illia.data.InMemoryDataStorage" p:filePath="${data.file.path}" />
 
   <bean id="userDAO" class="com.illia.dao.UserDAO" >
     <property name="dataStorage" ref="dataStorage"/>
