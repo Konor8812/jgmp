@@ -1,50 +1,52 @@
 package com.illia.dao;
 
-
 import com.illia.data.DataStorage;
 import com.illia.model.User;
 import java.util.List;
-import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class UserDAO {
+public class UserDAO extends GenericDAO<User> {
 
   private final Logger logger = LoggerFactory.getLogger(TicketDAO.class);
-  private DataStorage dataStorage;
-  private static final String NAMESPACE = "user:";
+  private DataStorage<User> dataStorage;
 
-  public void setDataStorage(DataStorage dataStorage) {
+  public void setDataStorage(DataStorage<User> dataStorage) {
     this.dataStorage = dataStorage;
   }
 
-  public User saveUser(User user) {
+  @Override
+  public User save(User user) {
     logger.debug(String.format("Saving user with id=%s name=%s email=%s",
         user.getId(),
         user.getName(),
         user.getEmail()));
-    return (User) dataStorage.save(NAMESPACE + user.getId(), user);
+    return dataStorage.save(user);
   }
 
-  public User getUserById(long id) {
-    return (User) dataStorage.get(NAMESPACE + id);
+  @Override
+  public User get(long id) {
+    return dataStorage.get(id, User.class);
   }
 
-  public User updateUser(User user) {
-    return (User) dataStorage.update(NAMESPACE + user.getId(), user);
+  @Override
+  public User update(User user) {
+    return dataStorage.update(user);
   }
 
-  public User deleteUser(long id) {
-    return (User) dataStorage.delete(NAMESPACE + id);
+  @Override
+  public User delete(long id) {
+    return dataStorage.delete(id, User.class);
   }
 
-  public List<User> getAllUsers() {
-    return dataStorage.getAll(NAMESPACE).stream().map(x -> (User) x).collect(Collectors.toList());
+  @Override
+  public List<User> getAll() {
+    return dataStorage.getAll(User.class);
   }
 
   public User findUserByEmail(String email) {
-    return getAllUsers().stream()
-        .filter(x -> x.getEmail().equals(email))
+    return getAll().stream()
+        .filter(user -> user.getEmail().equals(email))
         .findFirst().get();
   }
 }

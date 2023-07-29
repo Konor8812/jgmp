@@ -39,61 +39,61 @@ public class UserServiceTest {
 
   @Test
   public void deleteUserShouldReturnTrueIfUserExists() {
-    when(userDAO.deleteUser(any(Long.class)))
+    when(userDAO.delete(any(Long.class)))
         .thenReturn(mock(User.class));
     assertTrue(userService.deleteUser(1L));
-    verify(userDAO, times(1)).deleteUser(any(Long.class));
+    verify(userDAO, times(1)).delete(any(Long.class));
   }
 
   @Test
   public void deleteUserShouldReturnFalseIfNoUserExist() {
-    when(userDAO.deleteUser(any(Long.class)))
+    when(userDAO.delete(any(Long.class)))
         .thenReturn(null);
     assertFalse(userService.deleteUser(1L));
-    verify(userDAO, times(1)).deleteUser(any(Long.class));
+    verify(userDAO, times(1)).delete(any(Long.class));
   }
 
   @Test
   public void updateUserShouldReturnReturnNullIfNoUserExisted() {
     var mock = mock(User.class);
-    when(userDAO.updateUser(mock))
+    when(userDAO.update(mock))
         .thenReturn(null);
     assertNull(userService.updateUser(mock));
-    verify(userDAO, times(1)).updateUser(same(mock));
+    verify(userDAO, times(1)).update(same(mock));
   }
 
   @Test
   public void updateUserShouldReturnReturnExistingUser() {
     var mock = mock(User.class);
-    when(userDAO.updateUser(mock))
+    when(userDAO.update(mock))
         .thenReturn(mock(User.class));
     assertNotEquals(mock, userService.updateUser(mock));
-    verify(userDAO, times(1)).updateUser(same(mock));
+    verify(userDAO, times(1)).update(same(mock));
   }
 
   @Test
   public void saveUserShouldReturnReturnNullIfNoUserExisted() {
     var mock = mock(User.class);
-    when(userDAO.saveUser(mock))
+    when(userDAO.save(mock))
         .thenReturn(null);
     assertNull(userService.createUser(mock));
-    verify(userDAO, times(1)).saveUser(eq(mock));
+    verify(userDAO, times(1)).save(eq(mock));
   }
 
   @Test
   public void saveUserShouldReturnReturnExistingUser() {
     var mock = mock(User.class);
-    when(userDAO.saveUser(mock))
+    when(userDAO.save(mock))
         .thenReturn(mock(User.class));
     assertNotEquals(mock, userService.createUser(mock));
-    verify(userDAO, times(1)).saveUser(same(mock));
+    verify(userDAO, times(1)).save(same(mock));
   }
 
   @Test
   public void getUsersByNameShouldCallDAOAndFilterResult() {
-    when(userDAO.getAllUsers()).thenReturn(usersList);
+    when(userDAO.getAll()).thenReturn(usersList);
     assertEquals(1, userService.getUsersByName("Name 1").size());
-    verify(userDAO, times(1)).getAllUsers();
+    verify(userDAO, times(1)).getAll();
   }
 
 
@@ -106,9 +106,9 @@ public class UserServiceTest {
 
   @Test
   public void getUserByIdShouldCallDAOAndFilterResult() {
-    when(userDAO.getUserById(1L)).thenReturn(usersList.get(1));
+    when(userDAO.get(1L)).thenReturn(usersList.get(1));
     assertNotNull(userService.getUserById(1L));
-    verify(userDAO, times(1)).getUserById(1L);
+    verify(userDAO, times(1)).get(1L);
   }
 
 
@@ -116,38 +116,12 @@ public class UserServiceTest {
     var list = new ArrayList<User>();
 
     for (int i = 0; i < 3; i++) {
-      int finalI = i;
-      list.add(new User() {
-        @Override
-        public long getId() {
-          return finalI;
-        }
+      list.add(User.builder()
+                   .id(i)
+                   .name("Name " + i)
+                   .email("Email " + i)
+          .build());
 
-        @Override
-        public void setId(long id) {
-
-        }
-
-        @Override
-        public String getName() {
-          return "Name " + finalI;
-        }
-
-        @Override
-        public void setName(String name) {
-
-        }
-
-        @Override
-        public String getEmail() {
-          return "Email " + finalI;
-        }
-
-        @Override
-        public void setEmail(String email) {
-
-        }
-      });
     }
     return list;
   }

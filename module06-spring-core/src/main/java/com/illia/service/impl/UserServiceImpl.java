@@ -16,22 +16,22 @@ public class UserServiceImpl implements UserService {
 
   @Override
   public boolean deleteUser(long userId) {
-    return userDAO.deleteUser(userId) != null;
+    return userDAO.delete(userId) != null;
   }
 
   @Override
   public User updateUser(User user) {
-    return userDAO.updateUser(user);
+    return userDAO.update(user);
   }
 
   @Override
   public User createUser(User user) {
-    return userDAO.saveUser(user);
+    return userDAO.save(user);
   }
 
   @Override
   public List<User> getUsersByName(String name) {
-    return userDAO.getAllUsers().stream()
+    return userDAO.getAll().stream()
         .filter(x -> x.getName().equals(name))
         .collect(Collectors.toList());
   }
@@ -43,6 +43,6 @@ public class UserServiceImpl implements UserService {
 
   @Override
   public User getUserById(long userId) {
-    return userDAO.getUserById(userId);
+    return userDAO.get(userId);
   }
 }

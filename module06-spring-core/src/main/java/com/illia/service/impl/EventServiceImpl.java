@@ -17,35 +17,35 @@ public class EventServiceImpl implements EventService {
 
   @Override
   public boolean deleteEvent(long eventId) {
-    return eventDAO.deleteEvent(eventId) != null;
+    return eventDAO.delete(eventId) != null;
   }
 
   @Override
   public Event updateEvent(Event event) {
-    return eventDAO.updateEvent(event);
+    return eventDAO.update(event);
   }
 
   @Override
   public Event createEvent(Event event) {
-    return eventDAO.saveEvent(event);
+    return eventDAO.save(event);
   }
 
   @Override
   public List<Event> getEventsForDay(Date day) {
-    return eventDAO.getAllTEvents().stream()
+    return eventDAO.getAll().stream()
         .filter(x -> x.getDate().equals(day))
         .collect(Collectors.toList());
   }
 
   @Override
   public List<Event> getEventByTitle(String title) {
-    return eventDAO.getAllTEvents().stream()
+    return eventDAO.getAll().stream()
         .filter(x -> x.getTitle().equals(title))
         .collect(Collectors.toList());
   }
 
   @Override
   public Event getEventById(long eventId) {
-    return eventDAO.getEventById(eventId);
+    return eventDAO.get(eventId);
   }
 }

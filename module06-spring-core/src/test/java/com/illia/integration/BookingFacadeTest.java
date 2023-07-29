@@ -26,7 +26,7 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 @ExtendWith(value = {SpringExtension.class})
-@ContextConfiguration(locations = "classpath:applicationContext.xml")
+@ContextConfiguration(locations = "classpath:testApplicationContext.xml")
 public class BookingFacadeTest {
 
   @Autowired
@@ -72,72 +72,18 @@ public class BookingFacadeTest {
 
 
   private Event createEvent(long id, String title, Date date) {
-    return new Event() {
-      @Override
-      public long getId() {
-        return id;
-      }
-
-      @Override
-      public void setId(long id) {
-
-      }
-
-      @Override
-      public String getTitle() {
-        return title;
-      }
-
-      @Override
-      public void setTitle(String title) {
-
-      }
-
-      @Override
-      public Date getDate() {
-        return date;
-      }
-
-      @Override
-      public void setDate(Date date) {
-
-      }
-
-    };
+    return Event.builder()
+        .id(id)
+        .title(title)
+        .date(date)
+        .build();
   }
 
   private User createUser(long id, String name, String email) {
-    return new User() {
-
-      @Override
-      public long getId() {
-        return id;
-      }
-
-      @Override
-      public void setId(long id) {
-      }
-
-      @Override
-      public String getName() {
-        return name;
-      }
-
-      @Override
-      public void setName(String name) {
-
-      }
-
-      @Override
-      public String getEmail() {
-        return email;
-      }
-
-      @Override
-      public void setEmail(String email) {
-
-      }
-    };
+    return User.builder()
+        .id(id)
+        .name(name)
+        .email(email)
+        .build();
   }
-
 }

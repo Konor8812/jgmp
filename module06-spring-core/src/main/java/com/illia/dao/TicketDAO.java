@@ -3,43 +3,48 @@ package com.illia.dao;
 import com.illia.data.DataStorage;
 import com.illia.model.Ticket;
 import java.util.List;
-import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class TicketDAO {
+public class TicketDAO extends GenericDAO<Ticket> {
 
   private final Logger logger = LoggerFactory.getLogger(TicketDAO.class);
-  private DataStorage dataStorage;
-  private static final String NAMESPACE = "ticket:";
+  private DataStorage<Ticket> dataStorage;
+  private long lastSavedTicketId = 0;
 
-  public void setDataStorage(DataStorage dataStorage) {
+  public void setDataStorage(DataStorage<Ticket> dataStorage) {
     this.dataStorage = dataStorage;
   }
 
-  public Ticket saveTicket(Ticket ticket) {
+  @Override
+  public Ticket save(Ticket ticket) {
+    ticket.setId(++lastSavedTicketId);
     logger.debug(String.format("Saving ticket with id=%s userId=%s eventId=%s place=%s category=%s",
         ticket.getId(),
         ticket.getUserId(),
         ticket.getEventId(),
         ticket.getPlace(),
         ticket.getCategory()));
-    return (Ticket) dataStorage.save(NAMESPACE + ticket.getId(), ticket);
+    return dataStorage.save(ticket);
   }
 
-  public Ticket getTicketById(long id) {
-    return (Ticket) dataStorage.get(NAMESPACE + id);
+  @Override
+  public Ticket get(long id) {
+    return dataStorage.get(id, Ticket.class);
   }
 
-  public Ticket updateTicket(Ticket ticket) {
-    return (Ticket) dataStorage.update(NAMESPACE + ticket.getId(), ticket);
+  @Override
+  public Ticket update(Ticket ticket) {
+    return dataStorage.update(ticket);
   }
 
-  public Ticket deleteTicket(long id) {
-    return (Ticket) dataStorage.delete(NAMESPACE + id);
+  @Override
+  public Ticket delete(long id) {
+    return dataStorage.delete(id, Ticket.class);
   }
 
-  public List<Ticket> getAllTickets() {
-    return dataStorage.getAll(NAMESPACE).stream().map(x -> (Ticket) x).collect(Collectors.toList());
+  @Override
+  public List<Ticket> getAll() {
+    return dataStorage.getAll(Ticket.class);
   }
 }

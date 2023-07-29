@@ -2,17 +2,17 @@ package com.illia.data;
 
 import java.util.List;
 
-public interface DataStorage {
+public interface DataStorage<T> {
 
-  Object save(String key, Object value);
+  T save(T value);
 
-  Object get(String key);
+  T get(Long id, Class<?> type);
 
-  Object update(String key, Object value);
+  T update(T value);
 
-  Object delete(String key);
+  T delete(Long id, Class<?> type);
 
-  List<Object> getAll(String namespace);
+  List<T> getAll(Class<?> type);
 
   void clean();
 }

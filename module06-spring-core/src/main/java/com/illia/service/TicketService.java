@@ -2,6 +2,7 @@ package com.illia.service;
 
 import com.illia.model.Event;
 import com.illia.model.Ticket;
+import com.illia.model.Ticket.Category;
 import com.illia.model.User;
 import java.util.List;
 
@@ -13,8 +14,5 @@ public interface TicketService {
 
   List<Ticket> getBookedTicketsByUser(User user);
 
-  Ticket bookTicket(Ticket ticket);
-
-  long getLastBookedTicketNumber();
-
+  Ticket bookTicket(long userId, long eventId, int place, Category category);
 }

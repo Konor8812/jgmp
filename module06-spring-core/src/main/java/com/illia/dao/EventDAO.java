@@ -3,41 +3,44 @@ package com.illia.dao;
 import com.illia.data.DataStorage;
 import com.illia.model.Event;
 import java.util.List;
-import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class EventDAO {
+public class EventDAO extends GenericDAO<Event> {
 
   private final Logger logger = LoggerFactory.getLogger(EventDAO.class);
-  private DataStorage dataStorage;
-  private static final String NAMESPACE = "event:";
+  private DataStorage<Event> dataStorage;
 
-  public void setDataStorage(DataStorage dataStorage) {
+  public void setDataStorage(DataStorage<Event> dataStorage) {
     this.dataStorage = dataStorage;
   }
 
-  public Event saveEvent(Event event) {
+  @Override
+  public Event save(Event event) {
     logger.debug(String.format("Saving event with id=%s title=%s date=%s",
         event.getId(),
         event.getTitle(),
         event.getDate()));
-    return (Event) dataStorage.save(NAMESPACE + event.getId(), event);
+    return dataStorage.save(event);
   }
 
-  public Event getEventById(long id) {
-    return (Event) dataStorage.get(NAMESPACE + id);
+  @Override
+  public Event get(long id) {
+    return dataStorage.get(id, Event.class);
   }
 
-  public Event updateEvent(Event event) {
-    return (Event) dataStorage.update(NAMESPACE + event.getId(), event);
+  @Override
+  public Event update(Event event) {
+    return dataStorage.update(event);
   }
 
-  public Event deleteEvent(long id) {
-    return (Event) dataStorage.delete(NAMESPACE + id);
+  @Override
+  public Event delete(long id) {
+    return dataStorage.delete(id, Event.class);
   }
 
-  public List<Event> getAllTEvents() {
-    return dataStorage.getAll(NAMESPACE).stream().map(x -> (Event) x).collect(Collectors.toList());
+  @Override
+  public List<Event> getAll() {
+    return dataStorage.getAll(Event.class);
   }
 }

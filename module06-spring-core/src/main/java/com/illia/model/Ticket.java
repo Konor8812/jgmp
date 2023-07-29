@@ -1,35 +1,17 @@
 package com.illia.model;
 
-/**
- * Created by maksym_govorischev.
- */
-public interface Ticket {
+import lombok.Builder;
+import lombok.Data;
 
-  enum Category {STANDARD, PREMIUM, BAR}
+@Data
+@Builder
+public class Ticket {
 
-  /**
-   * Ticket Id. UNIQUE.
-   *
-   * @return Ticket Id.
-   */
-  long getId();
+  private long id;
+  private long eventId;
+  private long userId;
+  private int place;
+  private Category category;
 
-  void setId(long id);
-
-  long getEventId();
-
-  void setEventId(long eventId);
-
-  long getUserId();
-
-  void setUserId(long userId);
-
-  Category getCategory();
-
-  void setCategory(Category category);
-
-  int getPlace();
-
-  void setPlace(int place);
-
+  public enum Category {STANDARD, PREMIUM, BAR}
 }

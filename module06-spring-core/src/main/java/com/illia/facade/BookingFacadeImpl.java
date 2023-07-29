@@ -97,59 +97,7 @@ public class BookingFacadeImpl implements BookingFacade {
 
   @Override
   public Ticket bookTicket(long userId, long eventId, int place, Category category) {
-    var id = ticketService.getLastBookedTicketNumber();
-    var ticket = new Ticket() {
-      @Override
-      public long getId() {
-        return id;
-      }
-
-      @Override
-      public void setId(long id) {
-
-      }
-
-      @Override
-      public long getEventId() {
-        return eventId;
-      }
-
-      @Override
-      public void setEventId(long eventId) {
-
-      }
-
-      @Override
-      public long getUserId() {
-        return userId;
-      }
-
-      @Override
-      public void setUserId(long userId) {
-
-      }
-
-      @Override
-      public Category getCategory() {
-        return category;
-      }
-
-      @Override
-      public void setCategory(Category category) {
-
-      }
-
-      @Override
-      public int getPlace() {
-        return place;
-      }
-
-      @Override
-      public void setPlace(int place) {
-
-      }
-    };
-    return ticketService.bookTicket(ticket);
+    return ticketService.bookTicket(userId, eventId, place, category);
   }
 
   @Override

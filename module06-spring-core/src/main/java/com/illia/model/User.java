@@ -1,30 +1,13 @@
 package com.illia.model;
 
-/**
- * Created by maksym_govorischev on 14/03/14.
- */
-public interface User {
+import lombok.Builder;
+import lombok.Data;
 
-  /**
-   * User Id. UNIQUE.
-   *
-   * @return User Id.
-   */
-  long getId();
+@Data
+@Builder
+public class User {
 
-  void setId(long id);
-
-  String getName();
-
-  void setName(String name);
-
-  /**
-   * User email. UNIQUE.
-   *
-   * @return User email.
-   */
-  String getEmail();
-
-  void setEmail(String email);
-
+  private long id;
+  private String name;
+  private String email;
 }

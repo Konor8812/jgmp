@@ -1,26 +1,14 @@
 package com.illia.model;
 
 import java.util.Date;
+import lombok.Builder;
+import lombok.Data;
 
-/**
- * Created by maksym_govorischev.
- */
-public interface Event {
+@Data
+@Builder
+public class Event {
 
-  /**
-   * Event id. UNIQUE.
-   *
-   * @return Event Id
-   */
-  long getId();
-
-  void setId(long id);
-
-  String getTitle();
-
-  void setTitle(String title);
-
-  Date getDate();
-
-  void setDate(Date date);
+  private long id;
+  private String title;
+  private Date date;
 }

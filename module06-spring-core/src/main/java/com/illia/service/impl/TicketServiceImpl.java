@@ -3,6 +3,7 @@ package com.illia.service.impl;
 import com.illia.dao.TicketDAO;
 import com.illia.model.Event;
 import com.illia.model.Ticket;
+import com.illia.model.Ticket.Category;
 import com.illia.model.User;
 import com.illia.service.TicketService;
 import java.util.List;
@@ -12,39 +13,38 @@ public class TicketServiceImpl implements TicketService {
 
   private TicketDAO ticketDAO;
 
-  private long lastBookedTicketNumber = 0;
   public void setTicketDAO(TicketDAO ticketDAO) {
     this.ticketDAO = ticketDAO;
   }
 
   @Override
   public boolean cancelTicket(long ticketId) {
-    return ticketDAO.deleteTicket(ticketId) != null;
+    return ticketDAO.delete(ticketId) != null;
   }
 
   @Override
   public List<Ticket> getBookedTicketsByEvent(Event event) {
-    return ticketDAO.getAllTickets().stream()
+    return ticketDAO.getAll().stream()
         .filter(x -> x.getEventId() == event.getId())
         .collect(Collectors.toList());
   }
 
   @Override
   public List<Ticket> getBookedTicketsByUser(User user) {
-    return ticketDAO.getAllTickets().stream()
+    return ticketDAO.getAll().stream()
         .filter(x -> x.getUserId() == user.getId())
         .collect(Collectors.toList());
   }
 
   @Override
-  public Ticket bookTicket(Ticket ticket) {
-    var savedTicket = ticketDAO.saveTicket(ticket);
-    ++lastBookedTicketNumber;
-    return savedTicket;
-  }
+  public Ticket bookTicket(long userId, long eventId, int place, Category category) {
+    var ticket = Ticket.builder()
+        .userId(userId)
+        .eventId(eventId)
+        .place(place)
+        .category(category)
+        .build();
 
-  @Override
-  public long getLastBookedTicketNumber() {
-    return lastBookedTicketNumber;
+    return ticketDAO.save(ticket);
   }
 }

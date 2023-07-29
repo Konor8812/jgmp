@@ -2,8 +2,8 @@ package com.illia.data;
 
 import com.illia.model.Event;
 import com.illia.model.Ticket;
+import com.illia.model.Ticket.Category;
 import com.illia.model.User;
-import jakarta.annotation.PostConstruct;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -14,11 +14,11 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.stream.Collectors;
 import org.springframework.core.io.ClassPathResource;
 
-public class InMemoryDataStorage implements DataStorage {
+@SuppressWarnings("unchecked")
+public class InMemoryDataStorage<T> implements DataStorage<T> {
 
   private Map<String, Object> storage;
 
@@ -27,30 +27,62 @@ public class InMemoryDataStorage implements DataStorage {
   }
 
   @Override
-  public Object save(String key, Object value) {
-    return storage.put(key, value);
+  public T save(T value) {
+    var prefix = resolvePrefixByType(value.getClass());
+    String key = null;
+    switch (prefix) {
+      case "user:" -> {
+        var user = (User) value;
+        key = prefix + user.getId();
+      }
+      case "event:" -> {
+        var event = (Event) value;
+        key = prefix + event.getId();
+      }
+      case "ticket:" -> {
+        var ticket = (Ticket) value;
+        key = prefix + ticket.getId();
+      }
+    }
+    storage.put(key, value);
+    return (T) storage.get(key);
   }
 
   @Override
-  public Object get(String key) {
-    return storage.get(key);
+  public T get(Long id, Class<?> type) {
+    return (T) storage.get(resolvePrefixByType(type) + id);
   }
 
   @Override
-  public Object update(String key, Object value) {
-    return storage.put(key, value);
+  public T update(T value) {
+    var prefix = resolvePrefixByType(value.getClass());
+    switch (prefix) {
+      case "user:" -> {
+        return (T) storage.put(prefix + ((User) value).getId(), value);
+      }
+      case "event:" -> {
+        return (T) storage.put(prefix + ((Event) value).getId(), value);
+      }
+      case "ticket:" -> {
+        return (T) storage.put(prefix + ((Ticket) value).getId(), value);
+      }
+      default -> {
+        return null;
+      }
+    }
   }
 
   @Override
-  public Object delete(String key) {
-    return storage.remove(key);
+  public T delete(Long id, Class<?> type) {
+    return (T) storage.remove(resolvePrefixByType(type) + id);
   }
 
   @Override
-  public List<Object> getAll(String namespace) {
+  public List<T> getAll(Class<?> type) {
+    var prefix = resolvePrefixByType(type);
     return storage.entrySet().stream()
-        .filter(x -> x.getKey().contains(namespace))
-        .map(Entry::getValue)
+        .filter(entry -> entry.getKey().contains(prefix))
+        .map(entry -> (T) entry.getValue())
         .collect(Collectors.toList());
   }
 
@@ -59,13 +91,21 @@ public class InMemoryDataStorage implements DataStorage {
     storage = new HashMap<>();
   }
 
+  private String resolvePrefixByType(Class<?> type) {
+    return switch (type.getSimpleName()) {
+      case "User" -> "user:";
+      case "Event" -> "event:";
+      case "Ticket" -> "ticket:";
+      default -> null;
+    };
+  }
+
   String filePath;
 
   public void setFilePath(String filePath) {
     this.filePath = filePath;
   }
 
-  @PostConstruct
   public void postConstruct() {
     var resource = new ClassPathResource(filePath);
     try (var reader = new BufferedReader(new InputStreamReader(resource.getInputStream()))) {
@@ -73,130 +113,32 @@ public class InMemoryDataStorage implements DataStorage {
 
       while (!((line = reader.readLine()) == null)) {
         var key = line.substring(0, line.indexOf(","));
-        var values = line.substring(line.indexOf(",")).split(":");
+        var values = line.substring(line.indexOf(",") + 1).split(":");
         if (key.contains("user")) {
-          storage.put(key, new User() {
-            @Override
-            public long getId() {
-              return Long.parseLong(values[0]);
-            }
-
-            @Override
-            public void setId(long id) {
-
-            }
-
-            @Override
-            public String getName() {
-              return values[2];
-            }
-
-            @Override
-            public void setName(String name) {
-
-            }
-
-            @Override
-            public String getEmail() {
-              return values[3];
-            }
-
-            @Override
-            public void setEmail(String email) {
-
-            }
-          });
-
+          storage.put(key,
+              User.builder()
+                  .id(Long.parseLong(values[0]))
+                  .name(values[1])
+                  .email(values[2])
+                  .build());
         } else if (key.contains("event")) {
           DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
-          storage.put(key, new Event() {
-            @Override
-            public long getId() {
-              return Long.parseLong(values[0]);
-            }
-
-            @Override
-            public void setId(long id) {
-
-            }
-
-            @Override
-            public String getTitle() {
-              return values[2];
-            }
-
-            @Override
-            public void setTitle(String title) {
-
-            }
-
-            @Override
-            public Date getDate() {
-              return Date.from(LocalDate.parse(values[3], formatter)
+          storage.put(key, Event.builder()
+              .id(Long.parseLong(values[0]))
+              .title(values[1])
+              .date(Date.from(LocalDate.parse(values[2], formatter)
                   .atStartOfDay()
-                  .toInstant(ZoneOffset.UTC));
-            }
-
-            @Override
-            public void setDate(Date date) {
-
-            }
-          });
-
+                  .toInstant(ZoneOffset.UTC)))
+              .build());
         } else if (key.contains("ticket")) {
-          storage.put(key, new Ticket() {
-            @Override
-            public long getId() {
-              return Long.parseLong(values[0]);
-            }
-
-            @Override
-            public void setId(long id) {
-
-            }
-
-            @Override
-            public long getEventId() {
-              return Long.parseLong(values[1]);
-            }
-
-            @Override
-            public void setEventId(long eventId) {
-
-            }
-
-            @Override
-            public long getUserId() {
-              return Long.parseLong(values[2]);
-            }
-
-            @Override
-            public void setUserId(long userId) {
-
-            }
-
-            @Override
-            public Category getCategory() {
-              return Category.valueOf(values[3]);
-            }
-
-            @Override
-            public void setCategory(Category category) {
-
-            }
-
-            @Override
-            public int getPlace() {
-              return Integer.parseInt(values[4]);
-            }
-
-            @Override
-            public void setPlace(int place) {
-
-            }
-          });
+          storage.put(key, Ticket.builder()
+              .id(Long.parseLong(values[0]))
+              .eventId(Long.parseLong(values[1]))
+              .userId(Long.parseLong(values[2]))
+              .category(Category.valueOf(values[3]))
+              .place(Integer.parseInt(values[4]))
+              .build());
         }
-
       }
     } catch (IOException ex) {
       ex.printStackTrace();
