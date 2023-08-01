@@ -4,4 +4,4 @@ include 'module02-messanger'
 include 'module03-chatgpt'
 include 'module04-builders'
 include 'module05-nosql'
-
+include 'module06-spring-core'
