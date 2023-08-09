@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>User</title>
+</head>
+<body>
+
+<form th:action="@{/user}" method="post">
+  <label>ID: <input type="text" name="id"/></label><br/>
+  <label>Name: <input type="text" name="name"/></label><br/>
+  <label>Email: <input type="email" name="email"/></label><br/>
+  <input type="submit" value="Create User"/>
+</form>
+
+<div th:if="${user != null}">
+  <p th:text="${user}"></p>
+</div>
+<br>
+<br>
+Find by name:
+<form th:action="@{/user/name}" method="get">
+  <input type="text" name="name"/><br/>
+  <input type="submit" value="Find"/>
+</form>
+</body>
+</html>

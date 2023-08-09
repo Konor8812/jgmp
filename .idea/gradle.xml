@@ -15,6 +15,7 @@
             <option value="$PROJECT_DIR$/module04-builders" />
             <option value="$PROJECT_DIR$/module05-nosql" />
             <option value="$PROJECT_DIR$/module06-spring-core" />
+            <option value="$PROJECT_DIR$/module07-spring-mvc" />
           </set>
         </option>
       </GradleProjectSettings>
