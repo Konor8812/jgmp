@@ -1,46 +1,15 @@
 package com.illia.dao;
 
-import com.illia.data.DataStorage;
 import com.illia.model.Event;
+import java.util.Date;
 import java.util.List;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.springframework.data.repository.CrudRepository;
 
-public class EventDAO extends GenericDAO<Event> {
+public interface EventDAO extends CrudRepository<Event, Long> {
 
-  private final Logger logger = LoggerFactory.getLogger(EventDAO.class);
-  private DataStorage<Event> dataStorage;
+  List<Event> getEventsByTitle(String title);
 
-  public void setDataStorage(DataStorage<Event> dataStorage) {
-    this.dataStorage = dataStorage;
-  }
+  List<Event> getEventsForDay(Date date);
 
-  @Override
-  public Event save(Event event) {
-    logger.debug(String.format("Saving event with id=%s title=%s date=%s",
-        event.getId(),
-        event.getTitle(),
-        event.getDate()));
-    return dataStorage.save(event);
-  }
-
-  @Override
-  public Event get(long id) {
-    return dataStorage.get(id, Event.class);
-  }
-
-  @Override
-  public Event update(Event event) {
-    return dataStorage.update(event);
-  }
-
-  @Override
-  public Event delete(long id) {
-    return dataStorage.delete(id, Event.class);
-  }
-
-  @Override
-  public List<Event> getAll() {
-    return dataStorage.getAll(Event.class);
-  }
+  Event updateEvent(Event event);
 }

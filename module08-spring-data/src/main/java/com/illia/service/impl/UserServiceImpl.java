@@ -4,24 +4,23 @@ import com.illia.dao.UserDAO;
 import com.illia.model.User;
 import com.illia.service.UserService;
 import java.util.List;
-import java.util.stream.Collectors;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
 
+@Service
+@RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
 
-  private UserDAO userDAO;
-
-  public void setUserDAO(UserDAO userDAO) {
-    this.userDAO = userDAO;
-  }
+  private final UserDAO userDAO;
 
   @Override
-  public boolean deleteUser(long userId) {
-    return userDAO.delete(userId) != null;
+  public void deleteUser(long userId) {
+    userDAO.deleteById(userId);
   }
 
   @Override
   public User updateUser(User user) {
-    return userDAO.update(user);
+    return userDAO.updateUser(user);
   }
 
   @Override
@@ -31,18 +30,16 @@ public class UserServiceImpl implements UserService {
 
   @Override
   public List<User> getUsersByName(String name) {
-    return userDAO.getAll().stream()
-        .filter(x -> x.getName().equals(name))
-        .collect(Collectors.toList());
+    return userDAO.getUsersByName(name);
   }
 
   @Override
   public User getUserByEmail(String email) {
-    return userDAO.findUserByEmail(email);
+    return userDAO.getUserByEmail(email);
   }
 
   @Override
   public User getUserById(long userId) {
-    return userDAO.get(userId);
+    return userDAO.findById(userId).get();
   }
 }

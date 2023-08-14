@@ -6,25 +6,23 @@ import com.illia.model.Ticket.Category;
 import com.illia.model.User;
 import com.illia.service.EventService;
 import com.illia.service.TicketService;
+import com.illia.service.UserAccountService;
 import com.illia.service.UserService;
 import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Component;
 
 
+@Component
+@RequiredArgsConstructor
 public class BookingFacadeImpl implements BookingFacade {
 
   private final UserService userService;
   private final TicketService ticketService;
   private final EventService eventService;
-
-  public BookingFacadeImpl(UserService userService,
-      TicketService ticketService,
-      EventService eventService) {
-    this.userService = userService;
-    this.ticketService = ticketService;
-    this.eventService = eventService;
-  }
+  private final UserAccountService userAccountService;
 
   @Override
   public Event getEventById(long eventId) {
@@ -59,7 +57,8 @@ public class BookingFacadeImpl implements BookingFacade {
 
   @Override
   public boolean deleteEvent(long eventId) {
-    return eventService.deleteEvent(eventId);
+    eventService.deleteEvent(eventId);
+    return true;
   }
 
   @Override
@@ -92,7 +91,8 @@ public class BookingFacadeImpl implements BookingFacade {
 
   @Override
   public boolean deleteUser(long userId) {
-    return userService.deleteUser(userId);
+    userService.deleteUser(userId);
+    return true;
   }
 
   @Override
@@ -119,5 +119,10 @@ public class BookingFacadeImpl implements BookingFacade {
   @Override
   public boolean cancelTicket(long ticketId) {
     return ticketService.cancelTicket(ticketId);
+  }
+
+  @Override
+  public void refillAccountFunds(long id, long amount) {
+    userAccountService.refill(id, amount);
   }
 }

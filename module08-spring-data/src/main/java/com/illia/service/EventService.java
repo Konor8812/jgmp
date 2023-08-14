@@ -6,7 +6,7 @@ import java.util.List;
 
 public interface EventService {
 
-  boolean deleteEvent(long eventId);
+  void deleteEvent(long eventId);
 
   Event updateEvent(Event event);
 

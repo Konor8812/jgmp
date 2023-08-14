@@ -1,60 +1,56 @@
 package com.illia.integration;
 
 
+import static com.illia.integration.constants.TestConstants.EVENT_PRICE;
 import static com.illia.integration.constants.TestConstants.EXISTING_EVENT_DATE;
-import static com.illia.integration.constants.TestConstants.EXISTING_EVENT_ID;
 import static com.illia.integration.constants.TestConstants.EXISTING_EVENT_TITLE;
 import static com.illia.integration.constants.TestConstants.EXISTING_USER_EMAIL;
-import static com.illia.integration.constants.TestConstants.EXISTING_USER_ID;
 import static com.illia.integration.constants.TestConstants.EXISTING_USER_NAME;
+import static com.illia.integration.constants.TestConstants.FUNDS_AMOUNT;
 import static com.illia.integration.constants.TestConstants.PLACE;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import com.illia.data.DataStorage;
 import com.illia.facade.BookingFacade;
 import com.illia.model.Event;
 import com.illia.model.Ticket.Category;
 import com.illia.model.User;
+import com.illia.model.UserAccount;
 import java.util.Date;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 @ExtendWith(value = {SpringExtension.class})
 @ContextConfiguration(locations = "classpath:testApplicationContext.xml")
+@Sql(scripts = "classpath:createTestDatabase.sql")
+@DirtiesContext
 public class BookingFacadeTest {
 
   @Autowired
   BookingFacade facade;
 
-  @Autowired
-  DataStorage dataStorage;
-  @AfterEach
-  public void cleanStorage(){
-    dataStorage.clean();
-  }
-
   @Test
   public void shouldSaveUserToStorage() {
-    var user = createUser(EXISTING_USER_ID, EXISTING_USER_NAME, EXISTING_USER_EMAIL);
+    var user = createUser(EXISTING_USER_NAME, EXISTING_USER_EMAIL, 0);
 
-    facade.createUser(user);
-    var response = facade.getUserById(EXISTING_USER_ID);
+    var response = facade.createUser(user);
     assertNotNull(response);
-    assertEquals(user.getId(), response.getId());
+    assertNotEquals(0, response.getId());
     assertEquals(user.getName(), response.getName());
     assertEquals(user.getEmail(), response.getEmail());
   }
 
   @Test
   public void shouldCreateTicketBasedOnUserAndEvent_ThenDeleteTicket() {
-    var user = createUser(EXISTING_USER_ID, EXISTING_USER_NAME, EXISTING_USER_EMAIL);
-    var event = createEvent(EXISTING_EVENT_ID, EXISTING_EVENT_TITLE, EXISTING_EVENT_DATE);
+    var user = createUser(EXISTING_USER_NAME, EXISTING_USER_EMAIL, FUNDS_AMOUNT);
+    var event = createEvent(EXISTING_EVENT_TITLE, EXISTING_EVENT_DATE, EVENT_PRICE);
 
     facade.createUser(user);
     facade.createEvent(event);
@@ -71,19 +67,34 @@ public class BookingFacadeTest {
   }
 
 
-  private Event createEvent(long id, String title, Date date) {
+  private Event createEvent(String title, Date date, long price) {
     return Event.builder()
-        .id(id)
         .title(title)
         .date(date)
+        .price(price)
         .build();
   }
 
-  private User createUser(long id, String name, String email) {
+  private User createUser(String name, String email, long fundsAmount) {
     return User.builder()
-        .id(id)
         .name(name)
         .email(email)
+        .userAccount(UserAccount.builder()
+            .prepaid(fundsAmount)
+            .build())
         .build();
+  }
+
+  @Test
+  public void shouldCreateUserAndEvent_ThenCreateTicketAndWithdrawPriceFromUsersFunds() {
+    var user = createUser(EXISTING_USER_NAME, EXISTING_USER_EMAIL, FUNDS_AMOUNT);
+    var event = createEvent(EXISTING_EVENT_TITLE, EXISTING_EVENT_DATE, EVENT_PRICE);
+
+    facade.createUser(user);
+    facade.createEvent(event);
+
+    facade.bookTicket(user.getId(), event.getId(), PLACE, Category.PREMIUM);
+
+    assertEquals(FUNDS_AMOUNT - EVENT_PRICE, user.getUserAccount().getPrepaid());
   }
 }

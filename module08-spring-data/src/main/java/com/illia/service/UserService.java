@@ -5,7 +5,7 @@ import java.util.List;
 
 public interface UserService {
 
-  boolean deleteUser(long userId);
+  void deleteUser(long userId);
 
   User updateUser(User user);
 

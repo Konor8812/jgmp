@@ -6,33 +6,30 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
-import jakarta.persistence.Temporal;
-import jakarta.persistence.TemporalType;
-import java.util.Date;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Entity
-@Table(name = "events")
+@Table(name = "user_account_details")
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class Event {
+public class UserAccount {
 
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private long id;
-
   @Column
-  private String title;
+  private long prepaid;
 
-  @Column
-  @Temporal(TemporalType.DATE)
-  private Date date;
+  public void refill(long amount) {
+    prepaid += amount;
+  }
 
-  @Column
-  private long price;
+  public void withdraw(long amount) {
+    prepaid -= amount;
+  }
 }

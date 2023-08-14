@@ -6,23 +6,23 @@ import com.illia.service.EventService;
 import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
 
+@Service
+@RequiredArgsConstructor
 public class EventServiceImpl implements EventService {
 
-  private EventDAO eventDAO;
-
-  public void setEventDAO(EventDAO eventDAO) {
-    this.eventDAO = eventDAO;
-  }
+  private final EventDAO eventDAO;
 
   @Override
-  public boolean deleteEvent(long eventId) {
-    return eventDAO.delete(eventId) != null;
+  public void deleteEvent(long eventId) {
+    eventDAO.deleteById(eventId);
   }
 
   @Override
   public Event updateEvent(Event event) {
-    return eventDAO.update(event);
+    return eventDAO.updateEvent(event);
   }
 
   @Override
@@ -32,20 +32,20 @@ public class EventServiceImpl implements EventService {
 
   @Override
   public List<Event> getEventsForDay(Date day) {
-    return eventDAO.getAll().stream()
+    return ((List<Event>) eventDAO.findAll()).stream()
         .filter(x -> x.getDate().equals(day))
         .collect(Collectors.toList());
   }
 
   @Override
   public List<Event> getEventByTitle(String title) {
-    return eventDAO.getAll().stream()
+    return ((List<Event>) eventDAO.findAll()).stream()
         .filter(x -> x.getTitle().equals(title))
         .collect(Collectors.toList());
   }
 
   @Override
   public Event getEventById(long eventId) {
-    return eventDAO.get(eventId);
+    return eventDAO.findById(eventId).orElseThrow(() -> new RuntimeException("Not found"));
   }
 }

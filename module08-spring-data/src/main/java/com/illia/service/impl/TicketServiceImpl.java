@@ -7,33 +7,29 @@ import com.illia.model.Ticket.Category;
 import com.illia.model.User;
 import com.illia.service.TicketService;
 import java.util.List;
-import java.util.stream.Collectors;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
 
+@Service
+@RequiredArgsConstructor
 public class TicketServiceImpl implements TicketService {
 
-  private TicketDAO ticketDAO;
-
-  public void setTicketDAO(TicketDAO ticketDAO) {
-    this.ticketDAO = ticketDAO;
-  }
+  private final TicketDAO ticketDAO;
 
   @Override
   public boolean cancelTicket(long ticketId) {
-    return ticketDAO.delete(ticketId) != null;
+    ticketDAO.deleteById(ticketId);
+    return true;
   }
 
   @Override
   public List<Ticket> getBookedTicketsByEvent(Event event) {
-    return ticketDAO.getAll().stream()
-        .filter(x -> x.getEventId() == event.getId())
-        .collect(Collectors.toList());
+    return ticketDAO.getTicketsByEvent(event);
   }
 
   @Override
   public List<Ticket> getBookedTicketsByUser(User user) {
-    return ticketDAO.getAll().stream()
-        .filter(x -> x.getUserId() == user.getId())
-        .collect(Collectors.toList());
+    return ticketDAO.getTicketsByUser(user);
   }
 
   @Override
