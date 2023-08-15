@@ -2,11 +2,15 @@ package com.illia.config;
 
 import java.util.Properties;
 import javax.sql.DataSource;
+import org.hibernate.SessionFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.jdbc.datasource.DriverManagerDataSource;
+import org.springframework.orm.hibernate5.HibernateTransactionManager;
 import org.springframework.orm.hibernate5.LocalSessionFactoryBean;
+import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.transaction.TransactionManager;
 
 @Configuration
 public class HibernateConfig {
@@ -27,6 +31,13 @@ public class HibernateConfig {
     sessionFactory.setHibernateProperties(hibernateProperties());
     sessionFactory.setPackagesToScan("com.illia.model");
     return sessionFactory;
+  }
+
+  @Bean
+  public PlatformTransactionManager transactionManager(SessionFactory sessionFactory){
+    var tm = new HibernateTransactionManager();
+    tm.setSessionFactory(sessionFactory);
+    return tm;
   }
 
   private Properties hibernateProperties() {

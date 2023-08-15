@@ -3,6 +3,7 @@ package com.illia.dao.impl;
 import com.illia.dao.UserAccountDAO;
 import com.illia.data.SessionsManager;
 import com.illia.model.UserAccount;
+import jakarta.transaction.Transactional;
 import java.util.ArrayList;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
@@ -18,19 +19,13 @@ public class UserAccountDAOImpl implements UserAccountDAO {
   private final SessionsManager sessionsManager;
   private final Class<UserAccount> type = UserAccount.class;
 
+  @Transactional
   @Override
   public <S extends UserAccount> S save(S userAccount) {
     logger.info("Saving userAccount: " + userAccount);
 
     var session = sessionsManager.getSession();
-    try {
-      var transaction = session.beginTransaction();
-      session.persist(userAccount);
-      transaction.commit();
-    } catch (Exception ex) {
-      session.getTransaction().rollback();
-    }
-
+    session.persist(userAccount);
     return userAccount;
   }
 

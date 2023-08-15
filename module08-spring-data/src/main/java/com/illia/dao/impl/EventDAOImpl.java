@@ -3,6 +3,7 @@ package com.illia.dao.impl;
 import com.illia.dao.EventDAO;
 import com.illia.data.SessionsManager;
 import com.illia.model.Event;
+import jakarta.transaction.Transactional;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -20,6 +21,7 @@ public class EventDAOImpl implements EventDAO {
   private final SessionsManager sessionsManager;
   private final Class<Event> type = Event.class;
 
+  @Transactional
   @Override
   public <S extends Event> S save(S event) {
     logger.info(String.format("Saving event with id=%s title=%s date=%s",
@@ -28,15 +30,7 @@ public class EventDAOImpl implements EventDAO {
         event.getDate()));
 
     var session = sessionsManager.getSession();
-    try {
-      var transaction = session.beginTransaction();
-      session.persist(event);
-      transaction.commit();
-    } catch (Exception ex) {
-      ex.printStackTrace();
-      session.getTransaction().rollback();
-    }
-
+    session.persist(event);
     return event;
   }
 

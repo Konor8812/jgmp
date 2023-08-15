@@ -3,6 +3,7 @@ package com.illia.dao.impl;
 import com.illia.dao.UserDAO;
 import com.illia.data.SessionsManager;
 import com.illia.model.User;
+import jakarta.transaction.Transactional;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -19,20 +20,13 @@ public class UserDAOImpl implements UserDAO {
   private final SessionsManager sessionsManager;
   private final Class<User> type = User.class;
 
+  @Transactional
   @Override
   public <S extends User> S save(S user) {
     logger.info("Saving user: " + user);
 
     var session = sessionsManager.getSession();
-    try {
-      var transaction = session.beginTransaction();
-      session.persist(user);
-      transaction.commit();
-    } catch (Exception ex) {
-      ex.printStackTrace();
-      session.getTransaction().rollback();
-    }
-
+    session.persist(user);
     return user;
   }
 

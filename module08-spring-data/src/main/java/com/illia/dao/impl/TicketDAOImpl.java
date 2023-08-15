@@ -5,6 +5,7 @@ import com.illia.data.SessionsManager;
 import com.illia.model.Event;
 import com.illia.model.Ticket;
 import com.illia.model.User;
+import jakarta.transaction.Transactional;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -21,24 +22,19 @@ public class TicketDAOImpl implements TicketDAO {
   private final SessionsManager sessionsManager;
   private final Class<Ticket> type = Ticket.class;
 
+  @Transactional
   @Override
   public <S extends Ticket> S save(S ticket) {
     logger.info("Saving ticket: " + ticket);
 
     var session = sessionsManager.getSession();
-    try {
-      var transaction = session.beginTransaction();
-      var user = session.get(User.class, ticket.getUserId());
-      var event = session.get(Event.class, ticket.getEventId());
-      ticket.setUser(user);
-      ticket.setEvent(event);
-      session.persist(ticket);
-      ticket.getUser().getUserAccount().withdraw(ticket.getEvent().getPrice());
-      transaction.commit();
-    } catch (Exception ex) {
-      ex.printStackTrace();
-      session.getTransaction().rollback();
-    }
+
+    var user = session.get(User.class, ticket.getUserId());
+    var event = session.get(Event.class, ticket.getEventId());
+    ticket.setUser(user);
+    ticket.setEvent(event);
+    session.persist(ticket);
+    ticket.getUser().getUserAccount().withdraw(ticket.getEvent().getPrice());
 
     return ticket;
   }
