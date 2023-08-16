@@ -31,6 +31,9 @@ public class TicketDAOImpl implements TicketDAO {
 
     var user = session.get(User.class, ticket.getUserId());
     var event = session.get(Event.class, ticket.getEventId());
+    if(user.getUserAccount().getPrepaid() < event.getPrice()){
+      throw new RuntimeException("Not enough funds to book a ticket!");
+    }
     ticket.setUser(user);
     ticket.setEvent(event);
     session.persist(ticket);
