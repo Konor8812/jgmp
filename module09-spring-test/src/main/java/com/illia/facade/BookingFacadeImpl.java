@@ -3,7 +3,6 @@ package com.illia.facade;
 import com.illia.model.Event;
 import com.illia.model.Ticket;
 import com.illia.model.Ticket.Category;
-import com.illia.model.Tickets;
 import com.illia.model.User;
 import com.illia.service.EventService;
 import com.illia.service.TicketService;
