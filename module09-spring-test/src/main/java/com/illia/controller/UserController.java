@@ -4,13 +4,9 @@ import com.illia.facade.BookingFacade;
 import com.illia.model.User;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
-import org.apache.coyote.Response;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -48,24 +44,19 @@ public class UserController {
 
   @PostMapping("")
   public ResponseEntity<User> create(@RequestBody User user) {
-    var user = bookingFacade.createUser(createUser(id, name, email));
-    model.addAttribute("entity", user);
-    return ResponseEntity.ok(user);
+    var createdUser = bookingFacade.createUser(user);
+    return ResponseEntity.ok(createdUser);
   }
 
   @DeleteMapping("/{id}")
-  public String delete(@PathVariable final Long id,
-      Model model) {
+  public ResponseEntity<String> delete(@PathVariable final Long id) {
     var user = bookingFacade.deleteUser(id);
-    model.addAttribute("entity", user);
-    return ResponseEntity.ok(user);
+    return ResponseEntity.ok("Successfully deleted");
   }
 
   @GetMapping("/email/{email}")
-  public String getByEmail(@PathVariable final String email,
-      Model model) {
+  public ResponseEntity<User> getByEmail(@PathVariable final String email) {
     var user = bookingFacade.getUserByEmail(email);
-    model.addAttribute("entity", user);
     return ResponseEntity.ok(user);
   }
 

@@ -1,26 +1,17 @@
 package com.illia.facade;
 
+import com.illia.model.BookTicketRequest;
 import com.illia.model.Event;
 import com.illia.model.Ticket;
 import com.illia.model.Ticket.Category;
 import com.illia.model.User;
+import com.illia.service.BookingService;
 import com.illia.service.EventService;
 import com.illia.service.TicketService;
 import com.illia.service.UserService;
-import java.io.InputStream;
 import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
-
-import org.springframework.batch.core.Job;
-import org.springframework.batch.core.JobExecutionException;
-import org.springframework.batch.core.JobParameters;
-import org.springframework.batch.core.launch.JobLauncher;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
-
-import javax.xml.transform.stream.StreamSource;
-import org.springframework.oxm.jaxb.Jaxb2Marshaller;
 import org.springframework.stereotype.Component;
 
 
@@ -30,13 +21,14 @@ public class BookingFacadeImpl implements BookingFacade {
   private final UserService userService;
   private final TicketService ticketService;
   private final EventService eventService;
+  private final BookingService bookingService;
 
-  public BookingFacadeImpl(UserService userService,
-      TicketService ticketService,
-      EventService eventService) {
+  public BookingFacadeImpl(UserService userService, TicketService ticketService,
+      EventService eventService, BookingService bookingService) {
     this.userService = userService;
     this.ticketService = ticketService;
     this.eventService = eventService;
+    this.bookingService = bookingService;
   }
 
   @Override
@@ -108,9 +100,16 @@ public class BookingFacadeImpl implements BookingFacade {
     return userService.deleteUser(userId);
   }
 
+
+  @Deprecated
   @Override
   public Ticket bookTicket(long userId, long eventId, int place, Category category) {
     return ticketService.bookTicket(userId, eventId, place, category);
+  }
+
+  @Override
+  public void bookTicket(BookTicketRequest bookTicketRequest) {
+    bookingService.sendBookTicketRequest(bookTicketRequest);
   }
 
   @Override
@@ -134,32 +133,5 @@ public class BookingFacadeImpl implements BookingFacade {
     return ticketService.cancelTicket(ticketId);
   }
 
-
-  @Autowired
-  JobLauncher jobLauncher;
-
-  @Autowired
-  @Qualifier("preloadTicketsJob")
-  Job job;
-
-  @Override
-  public void preloadTicketsFromFile()
-      throws JobExecutionException {
-    jobLauncher.run(job, new JobParameters());
-  }
-
-  @Autowired
-  Jaxb2Marshaller jaxb2Marshaller;
-
-  @Override
-  public void preloadTicketsFromInputStream(InputStream inputStream) {
-    var tickets = (Tickets) jaxb2Marshaller.unmarshal(
-        new StreamSource(inputStream));
-    for (var ticket : tickets.getTicketList()) {
-      ticketService.bookTicket(ticket.getUserId(), ticket.getEventId(), ticket.getPlace(),
-          ticket.getCategory());
-    }
-
-  }
 
 }

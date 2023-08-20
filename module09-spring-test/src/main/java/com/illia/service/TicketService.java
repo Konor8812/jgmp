@@ -1,5 +1,6 @@
 package com.illia.service;
 
+import com.illia.model.BookTicketRequest;
 import com.illia.model.Event;
 import com.illia.model.Ticket;
 import com.illia.model.Ticket.Category;

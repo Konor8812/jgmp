@@ -1,12 +1,11 @@
 package com.illia.facade;
 
+import com.illia.model.BookTicketRequest;
 import com.illia.model.Event;
 import com.illia.model.Ticket;
 import com.illia.model.User;
-import java.io.InputStream;
 import java.util.Date;
 import java.util.List;
-import org.springframework.batch.core.JobExecutionException;
 
 /**
  * Groups together all operations related to tickets booking. Created by maksym_govorischev.
@@ -126,6 +125,8 @@ public interface BookingFacade {
    */
   Ticket bookTicket(long userId, long eventId, int place, Ticket.Category category);
 
+  void bookTicket(BookTicketRequest bookTicketRequest);
+
   /**
    * Get all booked tickets for specified user. Tickets should be sorted by event date in descending
    * order.
@@ -156,6 +157,4 @@ public interface BookingFacade {
    */
   boolean cancelTicket(long ticketId);
 
-  void preloadTicketsFromInputStream(InputStream inputStream);
-  void preloadTicketsFromFile() throws JobExecutionException;
 }

@@ -1,6 +1,7 @@
 package com.illia.service.impl;
 
 import com.illia.dao.TicketDAO;
+import com.illia.model.BookTicketRequest;
 import com.illia.model.Event;
 import com.illia.model.Ticket;
 import com.illia.model.Ticket.Category;
@@ -9,6 +10,7 @@ import com.illia.service.TicketService;
 import java.util.List;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
+import org.springframework.jms.annotation.JmsListener;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -36,6 +38,7 @@ public class TicketServiceImpl implements TicketService {
         .collect(Collectors.toList());
   }
 
+  @Deprecated
   @Override
   public Ticket bookTicket(long userId, long eventId, int place, Category category) {
     var ticket = Ticket.builder()
@@ -46,5 +49,20 @@ public class TicketServiceImpl implements TicketService {
         .build();
 
     return ticketDAO.save(ticket);
+  }
+
+  @JmsListener(destination = "${jms.bookTicket.queue}")
+  public void receiveBookingRequest(BookTicketRequest bookTicketRequest) {
+    try {
+      Thread.sleep(100);  // processing delay imitation
+    } catch (InterruptedException e) {
+      throw new RuntimeException(e);
+    }
+    ticketDAO.save(Ticket.builder()
+        .userId(bookTicketRequest.getUserId())
+        .eventId(bookTicketRequest.getEventId())
+        .place(bookTicketRequest.getPlace())
+        .category(bookTicketRequest.getCategory())
+        .build());
   }
 }
