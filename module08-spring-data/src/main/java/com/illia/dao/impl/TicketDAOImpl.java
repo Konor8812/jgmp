@@ -10,6 +10,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
+import org.hibernate.annotations.Cache;
+import org.hibernate.annotations.CacheConcurrencyStrategy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Repository;
@@ -31,7 +33,7 @@ public class TicketDAOImpl implements TicketDAO {
 
     var user = session.get(User.class, ticket.getUserId());
     var event = session.get(Event.class, ticket.getEventId());
-    if(user.getUserAccount().getPrepaid() < event.getPrice()){
+    if (user.getUserAccount().getPrepaid() < event.getPrice()) {
       throw new RuntimeException("Not enough funds to book a ticket!");
     }
     ticket.setUser(user);
@@ -50,6 +52,7 @@ public class TicketDAOImpl implements TicketDAO {
   }
 
   @Override
+  @Cache(region = "findAllRegion", usage = CacheConcurrencyStrategy.READ_WRITE)
   public Iterable<Ticket> findAll() {
     var session = sessionsManager.getSession();
 

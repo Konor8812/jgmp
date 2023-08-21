@@ -43,6 +43,11 @@ public class HibernateConfig {
   private Properties hibernateProperties() {
     Properties properties = new Properties();
     properties.setProperty("hibernate.show_sql", "true");
+    properties.setProperty("hibernate.cache.use_second_level_cache", "true");
+    properties.setProperty("hibernate.cache.use_query_cache", "true");
+    properties.setProperty("hibernate.cache.redisson.config", "redisson-config.json");
+    properties.setProperty("hibernate.cache.region.factory_class", "org.redisson.hibernate.RedissonRegionFactory");
+
     return properties;
   }
 

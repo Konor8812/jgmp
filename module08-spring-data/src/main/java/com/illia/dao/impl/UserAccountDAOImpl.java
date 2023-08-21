@@ -7,6 +7,8 @@ import jakarta.transaction.Transactional;
 import java.util.ArrayList;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
+import org.hibernate.annotations.Cache;
+import org.hibernate.annotations.CacheConcurrencyStrategy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Repository;
@@ -37,6 +39,7 @@ public class UserAccountDAOImpl implements UserAccountDAO {
   }
 
   @Override
+  @Cache(region = "findAllRegion", usage = CacheConcurrencyStrategy.READ_WRITE)
   public Iterable<UserAccount> findAll() {
     var session = sessionsManager.getSession();
 

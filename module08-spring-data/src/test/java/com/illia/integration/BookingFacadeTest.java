@@ -41,6 +41,7 @@ public class BookingFacadeTest {
     var user = createUser(EXISTING_USER_NAME, EXISTING_USER_EMAIL, 0);
 
     var response = facade.createUser(user);
+    System.out.println(response);
     assertNotNull(response);
     assertNotEquals(0, response.getId());
     assertEquals(user.getName(), response.getName());

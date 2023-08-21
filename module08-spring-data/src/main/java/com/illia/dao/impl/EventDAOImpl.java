@@ -9,6 +9,8 @@ import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
+import org.hibernate.annotations.Cache;
+import org.hibernate.annotations.CacheConcurrencyStrategy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Repository;
@@ -42,6 +44,7 @@ public class EventDAOImpl implements EventDAO {
   }
 
   @Override
+  @Cache(region = "findAllRegion", usage = CacheConcurrencyStrategy.READ_WRITE)
   public Iterable<Event> findAll() {
     var session = sessionsManager.getSession();
 
