@@ -1,0 +1,39 @@
+plugins {
+    id 'java'
+}
+
+group = 'com.illia'
+version = '1.0-SNAPSHOT'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    implementation 'org.springframework:spring-context:6.0.10'
+    implementation 'org.springframework:spring-core:6.0.10'
+    implementation 'org.springframework.data:spring-data-commons:3.1.2'
+    implementation 'org.springframework:spring-orm:6.0.10'
+    implementation 'com.h2database:h2:2.1.210'
+
+
+    implementation 'jakarta.annotation:jakarta.annotation-api:2.1.1'
+
+    implementation 'org.hibernate:hibernate-core:6.2.7.Final'
+    implementation 'org.redisson:redisson-hibernate-6:3.23.3'
+
+    implementation 'org.slf4j:slf4j-api:2.0.7'
+    implementation 'ch.qos.logback:logback-classic:1.4.8'
+
+    compileOnly 'org.projectlombok:lombok:1.18.26'
+    annotationProcessor 'org.projectlombok:lombok:1.18.26'
+
+    testImplementation 'org.springframework:spring-test:6.0.10'
+    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.9.3'
+    testImplementation 'org.junit.jupiter:junit-jupiter-engine:5.9.3'
+    testImplementation 'org.mockito:mockito-junit-jupiter:5.3.1'
+}
+
+test {
+    useJUnitPlatform()
+}

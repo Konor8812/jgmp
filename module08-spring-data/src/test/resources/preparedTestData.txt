@@ -1,0 +1,3 @@
+user:5,5:Johny:johny@epam.com
+event:8,8:october fest:16/09/2023
+ticket:3,3:8:5:STANDARD:2
