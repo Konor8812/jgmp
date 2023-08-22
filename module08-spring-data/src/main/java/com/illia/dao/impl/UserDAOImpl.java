@@ -3,7 +3,6 @@ package com.illia.dao.impl;
 import com.illia.dao.UserDAO;
 import com.illia.data.SessionsManager;
 import com.illia.model.User;
-import jakarta.transaction.Transactional;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -13,6 +12,9 @@ import org.hibernate.annotations.CacheConcurrencyStrategy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Isolation;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.interceptor.TransactionAspectSupport;
 
 @Repository
 @RequiredArgsConstructor
@@ -27,7 +29,7 @@ public class UserDAOImpl implements UserDAO {
   public <S extends User> S save(S user) {
     logger.info("Saving user: " + user);
 
-    var session = sessionsManager.getSession();
+    var session = sessionsManager.getCurrentSession();
     session.persist(user);
     return user;
   }
@@ -43,8 +45,10 @@ public class UserDAOImpl implements UserDAO {
   @Cache(region = "findAllRegion", usage = CacheConcurrencyStrategy.READ_WRITE)
   public Iterable<User> findAll() {
     var session = sessionsManager.getSession();
-
-    return session.createQuery("FROM " + type.getName(), type)
+    var query = session.createQuery("FROM " + type.getName(), type);
+    query.setCacheable(true);
+    query.setCacheRegion("findAllRegion");
+    return query
         .getResultList();
   }
 

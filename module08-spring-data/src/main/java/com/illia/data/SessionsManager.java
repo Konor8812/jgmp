@@ -18,4 +18,12 @@ public class SessionsManager {
   public Session getSession() {
     return session;
   }
+
+  public Session getCurrentSession(){
+    return sessionFactory.getCurrentSession();
+  }
+
+  public SessionFactory getSessionFactory() {
+    return sessionFactory;
+  }
 }

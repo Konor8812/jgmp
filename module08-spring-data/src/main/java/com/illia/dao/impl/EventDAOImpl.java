@@ -47,8 +47,10 @@ public class EventDAOImpl implements EventDAO {
   @Cache(region = "findAllRegion", usage = CacheConcurrencyStrategy.READ_WRITE)
   public Iterable<Event> findAll() {
     var session = sessionsManager.getSession();
-
-    return session.createQuery("FROM " + type.getName(), type)
+    var query  = session.createQuery("FROM " + type.getName(), type);
+    query.setCacheable(true);
+    query.setCacheRegion("findAllRegion");
+    return query
         .getResultList();
   }
 
