@@ -7,4 +7,4 @@ include 'module05-nosql'
 include 'module06-spring-core'
 include 'module07-spring-mvc'
 include 'module08-spring-data'
-
+include 'module09-spring-test'
