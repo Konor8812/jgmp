@@ -16,5 +16,13 @@
       <jdbc-url>jdbc:h2:file:D:\h2storage\jgmp</jdbc-url>
       <working-dir>$ProjectFileDir$</working-dir>
     </data-source>
+    <data-source source="LOCAL" name="jgmp_module10" uuid="7614823c-9c8e-486a-abb0-6d25a91a7a1a">
+      <driver-ref>h2.unified</driver-ref>
+      <synchronize>true</synchronize>
+      <configured-by-url>true</configured-by-url>
+      <jdbc-driver>org.h2.Driver</jdbc-driver>
+      <jdbc-url>jdbc:h2:file:D:\h2storage\jgmp_module10</jdbc-url>
+      <working-dir>$ProjectFileDir$</working-dir>
+    </data-source>
   </component>
 </project>
