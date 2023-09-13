@@ -11,6 +11,10 @@
   <modules>
     <module>business-services</module>
     <module>platform-services</module>
+    <module>business-services/one</module>
+    <module>business-services/two</module>
+    <module>business-services/common</module>
+    <module>business-services/two-api</module>
   </modules>
 
   <properties>

@@ -7,8 +7,16 @@
     <file url="file://$PROJECT_DIR$/module12-microservices/module12-microservices-api/discovery/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/module12-microservices/module12-microservices-api/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/module12-microservices/module12-microservices-api/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/module12-microservices/module12-microservices-business/business-services/common/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/module12-microservices/module12-microservices-business/business-services/common/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/module12-microservices/module12-microservices-business/business-services/one/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/module12-microservices/module12-microservices-business/business-services/one/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/module12-microservices/module12-microservices-business/business-services/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/module12-microservices/module12-microservices-business/business-services/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/module12-microservices/module12-microservices-business/business-services/two-api/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/module12-microservices/module12-microservices-business/business-services/two-api/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/module12-microservices/module12-microservices-business/business-services/two/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/module12-microservices/module12-microservices-business/business-services/two/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/module12-microservices/module12-microservices-business/platform-services/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/module12-microservices/module12-microservices-business/platform-services/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/module12-microservices/module12-microservices-business/src/main/java" charset="UTF-8" />
