@@ -8,14 +8,14 @@ import org.springframework.stereotype.Service;
 @Service
 public class BusinessComponent {
 
-  private final List<Number> values  = new ArrayList<>(List.of(14, 7, 2, 12, -5, 0));
+  private final List<Number> values = new ArrayList<>(List.of(14, 7, 2, 12, -5, 0));
   private final Counter counter;
 
   public BusinessComponent(Counter counter) {
     this.counter = counter;
   }
 
-  public List<? extends Number> getValues(){
+  public List<? extends Number> getValues() {
     values.set(5, counter.getValue());
     return values;
   }

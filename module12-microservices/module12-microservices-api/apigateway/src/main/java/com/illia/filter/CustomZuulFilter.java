@@ -24,7 +24,6 @@ public class CustomZuulFilter extends ZuulFilter {
 
   @Override
   public Object run() {
-    System.out.println("filter run");
     var requestContext = RequestContext.getCurrentContext();
     requestContext.addZuulRequestHeader("WasFilteredByCustomZuulFilter", "true");
     return null;

@@ -9,7 +9,7 @@ import org.springframework.context.annotation.Configuration;
 public class ArchaiusConfig {
 
   @Bean
-  DynamicStringProperty dynamicStringProperty(){
+  DynamicStringProperty dynamicStringProperty() {
     return DynamicPropertyFactory.getInstance()
         .getStringProperty("dsp-value", "no default value specified");
   }

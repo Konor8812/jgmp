@@ -13,15 +13,13 @@ public class ServoDemoController {
     this.invocationsCounter = invocationsCounter;
   }
 
-
   @GetMapping("/calls")
-  public Integer getServiceCallsAmount(){
+  public Integer getServiceCallsAmount() {
     return invocationsCounter.getValue().intValue();
   }
 
-
   @GetMapping("/service")
-  public String serviceCall(){
+  public String serviceCall() {
     invocationsCounter.increment();
     return "Service logic was called";
   }
