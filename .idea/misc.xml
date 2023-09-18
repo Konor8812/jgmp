@@ -14,6 +14,24 @@
         <option value="$PROJECT_DIR$/module12-microservices/module12-microservices-business/pom.xml" />
       </list>
     </option>
+        <option value="$PROJECT_DIR$/module11-rest/pom.xml" />
+        <option value="$PROJECT_DIR$/module11-rest/event-service-api/pom.xml" />
+        <option value="$PROJECT_DIR$/untitled/pom.xml" />
+        <option value="$PROJECT_DIR$/module11-restapi/pom.xml" />
+        <option value="$PROJECT_DIR$/module11-rest/event-service-impl/pom.xml" />
+        <option value="$PROJECT_DIR$/module11-rest/event-service-rest/pom.xml" />
+        <option value="$PROJECT_DIR$/module11-rest/event-service-dto/pom.xml" />
+        <option value="$PROJECT_DIR$/module11-rest/module11-rest-build/pom.xml" />
+        <option value="$PROJECT_DIR$/module11-rest/module11-rest-build/event-service-api/pom.xml" />
+        <option value="$PROJECT_DIR$/module11-rest/module11-rest-build/event-service-dto/pom.xml" />
+        <option value="$PROJECT_DIR$/module11-rest/module11-rest-build/event-service-impl/pom.xml" />
+        <option value="$PROJECT_DIR$/module11-rest/module11-rest-build/event-service-rest/pom.xml" />
+    <option name="ignoredFiles">
+      <set>
+        <option value="$PROJECT_DIR$/module11-restapi/pom.xml" />
+        <option value="$PROJECT_DIR$/untitled/pom.xml" />
+      </set>
+    </option>
   </component>
   <component name="ProjectRootManager" version="2" languageLevel="JDK_17" default="true" project-jdk-name="corretto-17" project-jdk-type="JavaSDK">
     <output url="file://$PROJECT_DIR$/out" />
