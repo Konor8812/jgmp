@@ -1,0 +1,29 @@
+plugins {
+    id 'java'
+}
+
+group = 'com.illia'
+version = '1.0-SNAPSHOT'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    testImplementation platform('org.junit:junit-bom:5.9.1')
+    testImplementation 'org.junit.jupiter:junit-jupiter'
+}
+
+task buildMavenModule(type: Exec){
+    workingDir 'module12-microservices-business'
+    commandLine 'cmd', '/c', 'mavenBuild.bat'
+
+    workingDir 'module12-microservices-api'
+    commandLine 'cmd', '/c', 'mavenBuild.bat'
+}
+
+build.dependsOn buildMavenModule
+
+test {
+    useJUnitPlatform()
+}

@@ -1,0 +1,33 @@
+version: "3"
+services:
+  api-gateway:
+    container_name: apigateway
+    environment:
+      - SPRING_PROFILES_ACTIVE=prod
+    build:
+      context: ./module12-microservices-api/apigateway
+    ports:
+      - "8765:8765"
+    depends_on:
+      - discovery
+
+  discovery:
+    container_name: eureka
+    environment:
+      - SPRING_PROFILES_ACTIVE=prod
+    build:
+      context: ./module12-microservices-api/discovery
+    ports:
+      - "8761:8761"
+
+  business:
+    container_name: business
+    environment:
+      - SPRING_PROFILES_ACTIVE=prod
+    build:
+      context: ./module12-microservices-business/business-services
+    ports:
+      - "8080:8080"
+
+    depends_on:
+      - discovery
