@@ -20,6 +20,8 @@
             <option value="$PROJECT_DIR$/module09-spring-test" />
             <option value="$PROJECT_DIR$/module10-spring-boot" />
             <option value="$PROJECT_DIR$/module11-rest" />
+            <option value="$PROJECT_DIR$/module14-clouds-rds" />
+            <option value="$PROJECT_DIR$/module15-clouds-dynamodb" />
           </set>
         </option>
       </GradleProjectSettings>
