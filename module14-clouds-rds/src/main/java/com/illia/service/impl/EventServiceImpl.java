@@ -1,8 +1,10 @@
 package com.illia.service.impl;
 
-import com.illia.repository.EventRepository;
 import com.illia.model.Event;
+import com.illia.repository.EventRepository;
 import com.illia.service.EventService;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -14,12 +16,12 @@ import org.springframework.stereotype.Service;
 public class EventServiceImpl implements EventService {
 
   private final EventRepository eventRepository;
-
+  private final SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
 
   @Override
   public boolean deleteEvent(long eventId) {
     eventRepository.deleteById(eventId);
-    return  true;
+    return true;
   }
 
   @Override
@@ -35,7 +37,13 @@ public class EventServiceImpl implements EventService {
   @Override
   public List<Event> getEventsForDay(Date day) {
     return eventRepository.findAll().stream()
-        .filter(x -> x.getDate().equals(day))
+        .filter(x -> {
+          try {
+            return sdf.parse(x.getDateAsString()).equals(day);
+          } catch (ParseException e) {
+            throw new RuntimeException(e);
+          }
+        })
         .collect(Collectors.toList());
   }
 
@@ -48,6 +56,6 @@ public class EventServiceImpl implements EventService {
 
   @Override
   public Event getEventById(long eventId) {
-    return eventRepository.findById(eventId).get();
+    return eventRepository.findById(eventId);
   }
 }

@@ -1,11 +1,8 @@
 package com.illia.model;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
-import java.util.Date;
+import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBAttribute;
+import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBHashKey;
+import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBTable;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -13,15 +10,15 @@ import lombok.NoArgsConstructor;
 
 @Data
 @Builder
-@Entity
-@Table(name = "_events")
+@DynamoDBTable(tableName = "_events")
 @NoArgsConstructor
 @AllArgsConstructor
 public class Event {
 
-  @Id
-  @GeneratedValue(strategy = GenerationType.IDENTITY)
+  @DynamoDBHashKey(attributeName = "id")
   private long id;
+  @DynamoDBAttribute(attributeName = "title")
   private String title;
-  private Date date;
+  @DynamoDBAttribute(attributeName = "date")
+  private String dateAsString;
 }

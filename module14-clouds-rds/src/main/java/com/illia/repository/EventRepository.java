@@ -1,10 +1,19 @@
 package com.illia.repository;
 
 import com.illia.model.Event;
-import org.springframework.data.jpa.repository.JpaRepository;
+import java.util.List;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface EventRepository extends JpaRepository<Event, Long> {
 
+public interface EventRepository {
+
+
+  Event save(Event event);
+
+  Event findById(long eventId);
+
+  List<Event> findAll();
+
+  void deleteById(long eventId);
 }
