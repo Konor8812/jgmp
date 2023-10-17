@@ -1,0 +1,22 @@
+plugins {
+    id 'java'
+}
+
+group = 'com.illia'
+version = '1.0-SNAPSHOT'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    implementation 'org.apache.activemq:artemis-jms-client:2.31.0'
+    implementation 'javax.jms:javax.jms-api:2.0.1'
+
+    compileOnly 'org.projectlombok:lombok:1.18.28'
+    annotationProcessor 'org.projectlombok:lombok:1.18.28'
+}
+
+test {
+    useJUnitPlatform()
+}

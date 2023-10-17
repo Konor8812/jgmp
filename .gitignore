@@ -44,3 +44,5 @@ bin/
 **/target/
 
 **/dependency-reduced-pom.xml
+
+logs.txt

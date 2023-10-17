@@ -5,7 +5,7 @@
     <option name="linkedExternalProjectsSettings">
       <GradleProjectSettings>
         <option name="externalProjectPath" value="$PROJECT_DIR$" />
-        <option name="gradleHome" value="" />
+        <option name="gradleHome" value="$USER_HOME$/gradle-8.1.1" />
         <option name="modules">
           <set>
             <option value="$PROJECT_DIR$" />
@@ -21,6 +21,20 @@
             <option value="$PROJECT_DIR$/module10-spring-boot" />
             <option value="$PROJECT_DIR$/module11-rest" />
             <option value="$PROJECT_DIR$/module12-microservices" />
+            <option value="$PROJECT_DIR$/module17-jms" />
+          </set>
+        </option>
+      </GradleProjectSettings>
+      <GradleProjectSettings>
+        <option name="distributionType" value="LOCAL" />
+        <option name="externalProjectPath" value="$PROJECT_DIR$/module17-jms/producer" />
+        <option name="gradleHome" value="$USER_HOME$/gradle-8.1.1" />
+        <option name="modules">
+          <set>
+            <option value="$PROJECT_DIR$/module17-jms" />
+            <option value="$PROJECT_DIR$/module17-jms/consumer" />
+            <option value="$PROJECT_DIR$/module17-jms/producer" />
+            <option value="$PROJECT_DIR$/module17-jms/statistics" />
           </set>
         </option>
       </GradleProjectSettings>
