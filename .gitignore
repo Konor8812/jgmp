@@ -46,3 +46,4 @@ bin/
 **/dependency-reduced-pom.xml
 
 logs.txt
+logsLocal.txt

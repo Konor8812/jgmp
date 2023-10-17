@@ -24,16 +24,26 @@ public class OrdersProcessor {
       var rejectedDestination = session.createQueue("rejected");
       var acceptedDestination = session.createQueue("accepted");
 
-      var consumer = session.createConsumer(ordersDestination);
+      String uncountablesSelector = "ContainsCountables = false";
+
+      var consumer = session.createConsumer(ordersDestination, uncountablesSelector);
 
       var rejectedProducer = session.createProducer(rejectedDestination);
       var acceptedProducer = session.createProducer(acceptedDestination);
 
       consumer.setMessageListener((message) -> {
-            try {
+        try {
+          System.out.println(((TextMessage) message).getText());
+        } catch (JMSException e) {
+          throw new RuntimeException(e);
+        }
+
+
+        try {
               var order = deserializeMessage(message);
               for (var product : order.positions()) {
                 var msg = session.createTextMessage();
+                System.out.println(msg);
 
                 if (product.amount() > 50 && !product.isCountable()) {
                   //rejected

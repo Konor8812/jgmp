@@ -30,10 +30,9 @@ public class OrdersProducer {
 //          / 1000000000, false, 11));
 //      sendOrder(order);
 //    }
-//
 //  }
 
-  public static void main(String[] args) {
+  public static void main2(String[] args) {
     boolean appRunning = true;
 
     while (appRunning) {
@@ -53,12 +52,15 @@ public class OrdersProducer {
     }
   }
 
+  private static boolean containsCountables = false;
+
   private static void createNewOrder() {
     Order order = new Order(readLine("What is your name?"));
     boolean orderFinished = false;
 
     while (!orderFinished) {
       var line = readLine("Add another product? \n 1) Yes \n 2) No");
+      containsCountables = false;
       if (line.equals("1")) {
         addNewPosition(order);
       } else if (line.equals("2")) {
@@ -91,6 +93,7 @@ public class OrdersProducer {
         : tryParseDecimal(readLine("Enter volume (decimal) "));
 
     if (amount != 0){
+      containsCountables = containsCountables || isCountable;
       order.addPosition(new Product(productName, price, isCountable, amount));
     }
   }
@@ -106,6 +109,9 @@ public class OrdersProducer {
       MessageProducer producer = session.createProducer(destination);
       var message = session.createTextMessage();
       message.setText(objectMapper.writeValueAsString(msg));
+
+      message.setBooleanProperty("ContainsCountables", containsCountables);
+
       System.out.println("Serialized value " + objectMapper.writeValueAsString(msg));
       producer.send(message);
       printMessage("Your order was sent further!");
