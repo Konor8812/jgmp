@@ -19,20 +19,10 @@ public class OrdersProducer {
   private static final BufferedReader consoleReader = new BufferedReader(
       new InputStreamReader(System.in));
   private static final ObjectMapper objectMapper = new ObjectMapper();
-  private static final ConnectionFactory connectionFactory = new ActiveMQConnectionFactory("tcp://localhost:61616", "admin", "admin");
+  private static final ConnectionFactory connectionFactory = new ActiveMQConnectionFactory(
+      "tcp://localhost:61616", "admin", "admin");
 
-
-//  public static void main(String[] args) throws InterruptedException {
-//    while(true){
-//      Thread.sleep(1000);
-//      var order = new Order("test " + System.currentTimeMillis());
-//      order.addPosition(new Product("Testproduct " + System.currentTimeMillis(), (double) System.currentTimeMillis()
-//          / 1000000000, false, 11));
-//      sendOrder(order);
-//    }
-//  }
-
-  public static void main2(String[] args) {
+  public static void main(String[] args) {
     boolean appRunning = true;
 
     while (appRunning) {
@@ -74,14 +64,14 @@ public class OrdersProducer {
   private static void addNewPosition(Order order) {
     var productName = readLine("Enter product");
 
-    if(productName == null){
+    if (productName == null) {
       return;
     }
 
     var price = productName.length() * 2;
     boolean isCountable;
 
-    switch (readLine("Is it countable? Y\\N").toUpperCase()){
+    switch (readLine("Is it countable? Y\\N").toUpperCase()) {
       case "Y" -> isCountable = true;
       case "N" -> isCountable = false;
       default -> {
@@ -92,30 +82,29 @@ public class OrdersProducer {
         tryParseInteger(readLine("Enter amount"))
         : tryParseDecimal(readLine("Enter volume (decimal) "));
 
-    if (amount != 0){
+    if (amount != 0) {
       containsCountables = containsCountables || isCountable;
       order.addPosition(new Product(productName, price, isCountable, amount));
     }
   }
 
   private static void sendOrder(Order order) {
-   sendMessage(order.toString());
+    sendMessage(order.toString());
   }
 
-  private static void sendMessage(String msg){
-    try(Connection connection = connectionFactory.createConnection()) {
+  private static void sendMessage(String msg) {
+    try (Connection connection = connectionFactory.createConnection()) {
       Session session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
-      Destination destination = session.createQueue("orders");
+      Destination destination = session.createTopic("ordersTopic");
       MessageProducer producer = session.createProducer(destination);
       var message = session.createTextMessage();
       message.setText(objectMapper.writeValueAsString(msg));
 
       message.setBooleanProperty("ContainsCountables", containsCountables);
 
-      System.out.println("Serialized value " + objectMapper.writeValueAsString(msg));
       producer.send(message);
       printMessage("Your order was sent further!");
-    }catch (Exception ex){
+    } catch (Exception ex) {
       ex.printStackTrace();
     }
 
@@ -130,26 +119,31 @@ public class OrdersProducer {
     }
     return "";
   }
+
   private static void printMessage(String message) {
     if (!message.isBlank()) {
       System.out.println(message);
     }
   }
+
   private static final Pattern decimalPattern = Pattern.compile("\\d+\\.\\d+");
+
   private static double tryParseDecimal(String input) {
-    if(decimalPattern.matcher(input).matches()) {
+    if (decimalPattern.matcher(input).matches()) {
       return Double.parseDouble(input);
     }
     return 0;
   }
 
   private static final Pattern integerPattern = Pattern.compile("\\d+");
+
   private static long tryParseInteger(String input) {
-    if(integerPattern.matcher(input).matches()) {
+    if (integerPattern.matcher(input).matches()) {
       return Long.parseLong(input);
     }
     return 0;
   }
+
   private static boolean validOperation(String input) {
     return input.equals("1") || input.equals("2");
   }

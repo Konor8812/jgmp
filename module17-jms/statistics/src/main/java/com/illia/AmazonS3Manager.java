@@ -6,6 +6,7 @@ import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.AmazonS3ClientBuilder;
 
 public class AmazonS3Manager {
+
   private AmazonS3Manager() {
   }
 
@@ -22,9 +23,9 @@ public class AmazonS3Manager {
         .withRegion("eu-north-1")
         .withCredentials(
             new AWSStaticCredentialsProvider(
-            new BasicAWSCredentials(
-                System.getenv("aws_public"),
-                System.getenv("aws_secret"))))
+                new BasicAWSCredentials(
+                    System.getenv("aws_public"),
+                    System.getenv("aws_secret"))))
         .build();
   }
 }

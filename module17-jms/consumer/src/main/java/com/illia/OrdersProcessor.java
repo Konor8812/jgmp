@@ -15,12 +15,11 @@ public class OrdersProcessor {
   private static final ConnectionFactory connectionFactory = new ActiveMQConnectionFactory(
       "tcp://localhost:61616", "admin", "admin");
 
-  public static void main(String[] args) throws Exception {
-//    Connection connection = connectionFactory.createConnection();
-    try (Connection connection = connectionFactory.createConnection()){
+  public static void main(String[] args) {
+    try (Connection connection = connectionFactory.createConnection()) {
       Session session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
 
-      var ordersDestination = session.createQueue("orders");
+      var ordersDestination = session.createTopic("ordersTopic");
       var rejectedDestination = session.createQueue("rejected");
       var acceptedDestination = session.createQueue("accepted");
 
@@ -32,22 +31,13 @@ public class OrdersProcessor {
       var acceptedProducer = session.createProducer(acceptedDestination);
 
       consumer.setMessageListener((message) -> {
-        try {
-          System.out.println(((TextMessage) message).getText());
-        } catch (JMSException e) {
-          throw new RuntimeException(e);
-        }
-
-
-        try {
+            try {
               var order = deserializeMessage(message);
               for (var product : order.positions()) {
                 var msg = session.createTextMessage();
-                System.out.println(msg);
 
                 if (product.amount() > 50 && !product.isCountable()) {
                   //rejected
-                  System.out.println("rejected 1");
                   try {
                     msg.setText("Order for " + order.customerName()
                         + " was rejected because you can't order more that 50 units per uncountable product!");
@@ -58,7 +48,6 @@ public class OrdersProcessor {
                   break;
                 } else if (product.price() < 4) {
                   // rejected
-                  System.out.println("rejected 2");
                   try {
                     msg.setText("Order for " + order.customerName()
                         + " was rejected because you can't order for less than 10 units per position");
@@ -69,7 +58,6 @@ public class OrdersProcessor {
                   break;
                 }
                 //accepted
-                System.out.println("accepted");
                 msg.setText("Order for " + order.customerName() + " was accepted");
                 acceptedProducer.send(msg);
               }

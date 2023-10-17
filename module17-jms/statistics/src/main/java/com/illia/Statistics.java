@@ -27,7 +27,6 @@ public class Statistics {
       "tcp://localhost:61616", "admin", "admin");
 
   public static void main(String[] args) throws Exception {
-//    Connection connection = connectionFactory.createConnection();
     try (Connection connection = connectionFactory.createConnection()) {
       Session session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
       var acceptedDestination = session.createQueue("accepted");
@@ -66,14 +65,9 @@ public class Statistics {
 
   private static final String filename = "logs.txt";
   private static final String filenameLocal = "logsLocal.txt";
-  private static void writeChanges(String row) {
-    try {
-      Files.delete(Path.of(filename));
-      Files.delete(Path.of(filenameLocal));
-    } catch (IOException e) {
-      e.printStackTrace();
-    }
 
+  private static void writeChanges(String row) {
+    prepareFiles();
     try {
       downloadFile();
 
@@ -102,8 +96,8 @@ public class Statistics {
         writer.write(line);
       }
 
-      if(!recordExists) {
-      writer.write(row + 1 + System.lineSeparator());
+      if (!recordExists) {
+        writer.write(row + 1 + System.lineSeparator());
       }
       writer.flush();
       uploadFile(Path.of(filenameLocal).toFile());
@@ -112,7 +106,15 @@ public class Statistics {
     }
 
 
+  }
 
+  private static void prepareFiles() {
+    try {
+      Files.delete(Path.of(filename));
+      Files.delete(Path.of(filenameLocal));
+    } catch (IOException e) {
+      e.printStackTrace();
+    }
   }
 
   private static void downloadFile() throws IOException {
@@ -124,7 +126,6 @@ public class Statistics {
   }
 
   private static void uploadFile(File file) {
-    System.out.println(file.getName());
     var s3client = AmazonS3Manager.getS3Client();
     var objectMetadata = new ObjectMetadata();
     objectMetadata.setContentType("text/plain");
