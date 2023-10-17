@@ -1,13 +1,17 @@
 package com.illia;
 
+import com.amazonaws.services.s3.model.GetObjectRequest;
+import com.amazonaws.services.s3.model.ObjectMetadata;
+import com.amazonaws.services.s3.model.PutObjectRequest;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.ArrayList;
 import java.util.regex.Pattern;
 import javax.jms.Connection;
 import javax.jms.ConnectionFactory;
@@ -60,55 +64,72 @@ public class Statistics {
 
   }
 
-
+  private static final String filename = "logs.txt";
+  private static final String filenameLocal = "logsLocal.txt";
   private static void writeChanges(String row) {
+    try {
+      Files.delete(Path.of(filename));
+      Files.delete(Path.of(filenameLocal));
+    } catch (IOException e) {
+      e.printStackTrace();
+    }
 
-    var path = Path.of("logs.txt");
+    try {
+      downloadFile();
 
-    if(Files.exists(path)){
-      System.out.println("file exists");
-      boolean recordExists = false;
-      var lines = new ArrayList<String>();
-      try (BufferedReader reader = new BufferedReader(new FileReader("logs.txt"))) {
-        while (reader.ready()) {
-          var line = reader.readLine();
-          if (line.startsWith(row)) {
-            var split = line.split("=");
-            var updatedValue = Long.parseLong(split[1]) + 1;
-            line = row + updatedValue;
-            recordExists = true;
-          }
-          lines.add(line);
-        }
-      } catch (IOException ex) {
-        ex.printStackTrace();
-      }
+    } catch (Exception e) {
       try {
-        Files.delete(path);
-      } catch (IOException e) {
-        e.printStackTrace();
-      }
-      System.out.println("content to write " + lines);
-      try (BufferedWriter writer = new BufferedWriter(new FileWriter("logs.txt", true))) {
-
-        for (var line : lines) {
-          writer.write(line + System.lineSeparator());
-        }
-        if (!recordExists){
-          writer.write(row + 1 + System.lineSeparator());
-        }
-      } catch (Exception e) {
-        e.printStackTrace();
-      }
-    }else {
-      try (BufferedWriter writer = new BufferedWriter(new FileWriter("logs.txt", true))) {
-        writer.write(row + 1 + System.lineSeparator());
-      } catch (Exception e) {
-        e.printStackTrace();
+        Files.createFile(Path.of(filename));
+      } catch (IOException ex) {
+        throw new RuntimeException(ex);
       }
     }
 
+    boolean recordExists = false;
 
+    try (BufferedReader reader = new BufferedReader(new FileReader(filename));
+        BufferedWriter writer = new BufferedWriter(new FileWriter(filenameLocal, true))) {
+
+      while (reader.ready()) {
+        var line = reader.readLine();
+
+        if (line.startsWith(row)) {
+          var split = line.split("=");
+          var updatedValue = Long.parseLong(split[1]) + 1;
+          line = row + updatedValue;
+          recordExists = true;
+        }
+        writer.write(line);
+      }
+
+      if(!recordExists) {
+      writer.write(row + 1 + System.lineSeparator());
+      }
+      writer.flush();
+      uploadFile(Path.of(filenameLocal).toFile());
+    } catch (IOException ex) {
+      ex.printStackTrace();
+    }
+
+
+
+  }
+
+  private static void downloadFile() throws IOException {
+    String bucketName = "jgmp";
+    var s3client = AmazonS3Manager.getS3Client();
+
+    var s3Object = s3client.getObject(new GetObjectRequest(bucketName, filename));
+    s3Object.getObjectContent().transferTo(new FileOutputStream(filename));
+  }
+
+  private static void uploadFile(File file) {
+    System.out.println(file.getName());
+    var s3client = AmazonS3Manager.getS3Client();
+    var objectMetadata = new ObjectMetadata();
+    objectMetadata.setContentType("text/plain");
+    var putRequest = new PutObjectRequest("jgmp", filename, file);
+    s3client.putObject(putRequest);
   }
 
   private static final Pattern messagePattern = Pattern.compile("Order for ([a-zA-Z]+) ");
