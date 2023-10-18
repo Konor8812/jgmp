@@ -42,15 +42,17 @@ public class OrdersProducer {
     }
   }
 
-  private static boolean containsCountables = false;
+  private static boolean containsUncountableProducts = false;
 
   private static void createNewOrder() {
-    Order order = new Order(readLine("What is your name?"));
-    boolean orderFinished = false;
+    var name = readLine("What is your name?");
+    while (!(isNameValid(name))) {
+      name = readLine("What is your name?");
+    }
+    Order order = new Order(name);
 
-    while (!orderFinished) {
+    while (true) {
       var line = readLine("Add another product? \n 1) Yes \n 2) No");
-      containsCountables = false;
       if (line.equals("1")) {
         addNewPosition(order);
       } else if (line.equals("2")) {
@@ -61,31 +63,47 @@ public class OrdersProducer {
     sendOrder(order);
   }
 
+  private static boolean isNameValid(String name) {
+    return name.matches("[a-zA-Z]{2,}");
+  }
+
   private static void addNewPosition(Order order) {
     var productName = readLine("Enter product");
 
-    if (productName == null) {
-      return;
+    while (productName == null) {
+      productName = readLine("Enter product");
     }
 
     var price = productName.length() * 2;
+    printMessage("This costs  " + price);
+
+    var isCountableInput = readLine("Is it countable? Y\\N").toUpperCase();
     boolean isCountable;
-
-    switch (readLine("Is it countable? Y\\N").toUpperCase()) {
-      case "Y" -> isCountable = true;
-      case "N" -> isCountable = false;
-      default -> {
-        return;
+    while (true) {
+      if (isCountableInput.equals("Y")) {
+        isCountable = true;
+        break;
+      } else if (isCountableInput.equals("N")) {
+        isCountable = false;
+        containsUncountableProducts = true;
+        break;
       }
+      isCountableInput = readLine("Is it countable? Y\\N").toUpperCase();
     }
-    var amount = isCountable ?
-        tryParseInteger(readLine("Enter amount"))
-        : tryParseDecimal(readLine("Enter volume (decimal) "));
 
-    if (amount != 0) {
-      containsCountables = containsCountables || isCountable;
-      order.addPosition(new Product(productName, price, isCountable, amount));
+    String amountInput;
+    Number amount;
+
+    while ((amount = isCountable ?
+        tryParseInteger(readLine("Enter amount"))
+        : tryParseDecimal(readLine("Enter volume"))) == null) {
     }
+
+    order.addPosition(new Product(productName,
+        price,
+        isCountable,
+        isCountable? amount.longValue() : amount.doubleValue()));
+
   }
 
   private static void sendOrder(Order order) {
@@ -100,7 +118,7 @@ public class OrdersProducer {
       var message = session.createTextMessage();
       message.setText(objectMapper.writeValueAsString(msg));
 
-      message.setBooleanProperty("ContainsCountables", containsCountables);
+      message.setBooleanProperty("containsUncountableProducts", containsUncountableProducts);
 
       producer.send(message);
       printMessage("Your order was sent further!");
@@ -128,20 +146,20 @@ public class OrdersProducer {
 
   private static final Pattern decimalPattern = Pattern.compile("\\d+\\.\\d+");
 
-  private static double tryParseDecimal(String input) {
+  private static Double tryParseDecimal(String input) {
     if (decimalPattern.matcher(input).matches()) {
       return Double.parseDouble(input);
     }
-    return 0;
+    return null;
   }
 
   private static final Pattern integerPattern = Pattern.compile("\\d+");
 
-  private static long tryParseInteger(String input) {
+  private static Long tryParseInteger(String input) {
     if (integerPattern.matcher(input).matches()) {
       return Long.parseLong(input);
     }
-    return 0;
+    return null;
   }
 
   private static boolean validOperation(String input) {

@@ -6,6 +6,7 @@ import javax.jms.Connection;
 import javax.jms.ConnectionFactory;
 import javax.jms.JMSException;
 import javax.jms.Message;
+import javax.jms.MessageListener;
 import javax.jms.Session;
 import javax.jms.TextMessage;
 import org.apache.activemq.artemis.jms.client.ActiveMQConnectionFactory;
@@ -20,62 +21,71 @@ public class OrdersProcessor {
       Session session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
 
       var ordersDestination = session.createTopic("ordersTopic");
-      var rejectedDestination = session.createQueue("rejected");
-      var acceptedDestination = session.createQueue("accepted");
 
-      String uncountablesSelector = "ContainsCountables = false";
+      String uncountablesSelector = "containsUncountableProducts = true";
+      String countablesSelector = "containsUncountableProducts = false";
 
-      var consumer = session.createConsumer(ordersDestination, uncountablesSelector);
+      var countablesConsumer = session.createConsumer(ordersDestination, countablesSelector);
+      var uncountablesConsumer = session.createConsumer(ordersDestination, uncountablesSelector);
 
-      var rejectedProducer = session.createProducer(rejectedDestination);
-      var acceptedProducer = session.createProducer(acceptedDestination);
-
-      consumer.setMessageListener((message) -> {
-            try {
-              var order = deserializeMessage(message);
-              for (var product : order.positions()) {
-                var msg = session.createTextMessage();
-
-                if (product.amount() > 50 && !product.isCountable()) {
-                  //rejected
-                  try {
-                    msg.setText("Order for " + order.customerName()
-                        + " was rejected because you can't order more that 50 units per uncountable product!");
-                    rejectedProducer.send(msg);
-                  } catch (JMSException e) {
-                    throw new RuntimeException(e);
-                  }
-                  break;
-                } else if (product.price() < 4) {
-                  // rejected
-                  try {
-                    msg.setText("Order for " + order.customerName()
-                        + " was rejected because you can't order for less than 10 units per position");
-                    rejectedProducer.send(msg);
-                  } catch (JMSException e) {
-                    throw new RuntimeException(e);
-                  }
-                  break;
-                }
-                //accepted
-                msg.setText("Order for " + order.customerName() + " was accepted");
-                acceptedProducer.send(msg);
-              }
-            } catch (Exception ex) {
-              ex.printStackTrace();
-            }
-          }
-      );
+      countablesConsumer.setMessageListener(createMessageListener(session, false));
+      uncountablesConsumer.setMessageListener(createMessageListener(session, true));
       connection.start();
       try {
-        Thread.sleep(Long.MAX_VALUE); // Sleep indefinitely.
+        // Sleep indefinitely to prevent app from shutting down.
+        Thread.sleep(Long.MAX_VALUE);
       } catch (InterruptedException e) {
       }
 
     } catch (Exception ex) {
       ex.printStackTrace();
     }
+  }
 
+  private static MessageListener createMessageListener(Session session, boolean forCountables)
+      throws JMSException {
+    var rejectedDestination = session.createQueue("rejected");
+    var acceptedDestination = session.createQueue("accepted");
+    var rejectedProducer = session.createProducer(rejectedDestination);
+    var acceptedProducer = session.createProducer(acceptedDestination);
+    return (message) -> {
+      try {
+        var order = deserializeMessage(message);
+        for (var product : order.positions()) {
+          var msg = session.createTextMessage();
+
+          if (order.total() > 100) {
+            // rejected
+            try {
+              msg.setText("Order for " + order.customerName()
+                  + " was rejected because you can't order for more than 100 units total");
+              rejectedProducer.send(msg);
+            } catch (JMSException e) {
+              throw new RuntimeException(e);
+            }
+            break;
+          }
+
+          if (product.amount() > 50 && !forCountables) {
+            //rejected
+            try {
+              msg.setText("Order for " + order.customerName()
+                  + " was rejected because you can't order more that 50 units per uncountable product!");
+              rejectedProducer.send(msg);
+            } catch (JMSException e) {
+              throw new RuntimeException(e);
+            }
+            break;
+          }
+
+          //accepted
+          msg.setText("Order for " + order.customerName() + " was accepted");
+          acceptedProducer.send(msg);
+        }
+      } catch (Exception ex) {
+        ex.printStackTrace();
+      }
+    };
   }
 
   private static Order deserializeMessage(Message message) throws JMSException {
@@ -94,7 +104,8 @@ public class OrdersProcessor {
       var productMatcher = productPattern.matcher(matcher.group(2));
       while (productMatcher.find()) {
         products.add(
-            new Product(productMatcher.group(1), Double.parseDouble(productMatcher.group(2)),
+            new Product(productMatcher.group(1),
+                Double.parseDouble(productMatcher.group(2)),
                 Boolean.parseBoolean(productMatcher.group(3)),
                 Double.parseDouble(productMatcher.group(4))));
       }

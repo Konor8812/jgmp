@@ -53,7 +53,8 @@ public class Statistics {
 
       connection.start();
       try {
-        Thread.sleep(Long.MAX_VALUE); // Sleep indefinitely.
+        // Sleep indefinitely to prevent app from shutting down.
+        Thread.sleep(Long.MAX_VALUE);
       } catch (InterruptedException e) {
       }
 
