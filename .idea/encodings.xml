@@ -1,6 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="Encoding">
+    <file url="file://$MAVEN_REPOSITORY$/org/springframework/boot/spring-boot-starter-parent/3.1.3/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/module11-rest-mvn/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/module11-rest-mvn/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/module11-rest/module11-rest-build/event-service-api/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/module11-rest/module11-rest-build/event-service-dto/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/module11-rest/module11-rest-build/event-service-impl/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/module11-rest/module11-rest-build/event-service-rest/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/module11-rest/module11-rest-build/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/module11-rest/module11-rest-build/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/module11-restapi/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/module11-restapi/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/module12-microservices/module12-microservices-api/apigateway/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/module12-microservices/module12-microservices-api/apigateway/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/module12-microservices/module12-microservices-api/discovery/src/main/java" charset="UTF-8" />
@@ -21,17 +32,10 @@
     <file url="file://$PROJECT_DIR$/module12-microservices/module12-microservices-business/platform-services/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/module12-microservices/module12-microservices-business/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/module12-microservices/module12-microservices-business/src/main/resources" charset="UTF-8" />
-    <file url="file://$MAVEN_REPOSITORY$/org/springframework/boot/spring-boot-starter-parent/3.1.3/src/main/resources" charset="UTF-8" />
-    <file url="file://$PROJECT_DIR$/module11-rest-mvn/src/main/java" charset="UTF-8" />
-    <file url="file://$PROJECT_DIR$/module11-rest-mvn/src/main/resources" charset="UTF-8" />
-    <file url="file://$PROJECT_DIR$/module11-rest/module11-rest-build/event-service-api/src/main/java" charset="UTF-8" />
-    <file url="file://$PROJECT_DIR$/module11-rest/module11-rest-build/event-service-dto/src/main/java" charset="UTF-8" />
-    <file url="file://$PROJECT_DIR$/module11-rest/module11-rest-build/event-service-impl/src/main/java" charset="UTF-8" />
-    <file url="file://$PROJECT_DIR$/module11-rest/module11-rest-build/event-service-rest/src/main/java" charset="UTF-8" />
-    <file url="file://$PROJECT_DIR$/module11-rest/module11-rest-build/src/main/java" charset="UTF-8" />
-    <file url="file://$PROJECT_DIR$/module11-rest/module11-rest-build/src/main/resources" charset="UTF-8" />
-    <file url="file://$PROJECT_DIR$/module11-restapi/src/main/java" charset="UTF-8" />
-    <file url="file://$PROJECT_DIR$/module11-restapi/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/module15-clouds-lambdas/update-lambda/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/module15-clouds-lambdas/update-lambda/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/module15-clouds-lambdas/upload-lambda/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/module15-clouds-lambdas/upload-lambda/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/untitled/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/untitled/src/main/resources" charset="UTF-8" />
   </component>

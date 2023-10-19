@@ -13,14 +13,14 @@
 
   <bean id="dataStorage" class="com.illia.data.InMemoryDataStorage" p:filePath="${data.file.path}" />
 
-  <bean id="userDAO" class="com.illia.dao.UserDAO" >
+  <bean id="userDAO" class="com.illia.dao.UserRepository" >
     <property name="dataStorage" ref="dataStorage"/>
   </bean>
 
-  <bean id="eventDAO" class="com.illia.dao.EventDAO" >
+  <bean id="eventDAO" class="com.illia.dao.EventRepository" >
     <property name="dataStorage" ref="dataStorage"/>
   </bean>
-  <bean id="ticketDAO" class="com.illia.dao.TicketDAO" >
+  <bean id="ticketDAO" class="com.illia.dao.TicketRepository" >
     <property name="dataStorage" ref="dataStorage"/>
   </bean>
 

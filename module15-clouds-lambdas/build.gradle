@@ -1,0 +1,31 @@
+plugins {
+    id 'java'
+    id "com.github.johnrengelman.shadow" version "8.1.1"
+}
+
+group = 'com.illia'
+version = '1.0-SNAPSHOT'
+
+task buildMavenModule(type: Exec){
+    workingDir 'upload-lambda'
+    commandLine 'cmd', '/c', 'mavenBuild.bat'
+
+    workingDir 'update-lambda'
+    commandLine 'cmd', '/c', 'mavenBuild.bat'
+}
+
+build.dependsOn buildMavenModule
+
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    compileOnly 'com.amazonaws:aws-lambda-java-core:1.2.3'
+    compileOnly 'com.amazonaws:aws-java-sdk-dynamodb:1.12.559'
+}
+
+test {
+
+}

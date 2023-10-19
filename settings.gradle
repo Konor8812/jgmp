@@ -11,5 +11,6 @@ include 'module09-spring-test'
 include 'module10-spring-boot'
 include 'module11-rest'
 include 'module12-microservices'
+include 'module14-clouds-rds'
+include 'module15-clouds-lambdas'
 include 'module16-dynamodb'
-
