@@ -1,0 +1,34 @@
+plugins {
+    id 'java'
+    id "com.github.johnrengelman.shadow" version "8.1.1"
+}
+
+group = 'com.illia'
+version = '1.0-SNAPSHOT'
+
+repositories {
+    mavenCentral()
+}
+
+shadowJar {
+    manifest {
+        attributes 'Main-Class': 'com.illia.ApplicationDemo'
+    }
+}
+
+tasks.build.dependsOn shadowJar
+
+dependencies {
+    implementation 'org.springframework.boot:spring-boot-starter-web:3.1.0'
+    implementation 'org.springframework.boot:spring-boot-starter-thymeleaf:3.1.0'
+
+    implementation 'com.amazonaws:aws-lambda-java-core:1.2.3'
+
+
+    compileOnly 'org.projectlombok:lombok:1.18.26'
+    annotationProcessor 'org.projectlombok:lombok:1.18.26'
+}
+
+test {
+    useJUnitPlatform()
+}
