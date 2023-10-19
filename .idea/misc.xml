@@ -12,20 +12,10 @@
         <option value="$PROJECT_DIR$/module12-microservices/module12-microservices-api/discovery/pom.xml" />
         <option value="$PROJECT_DIR$/module12-microservices/module12-microservices-api/pom.xml" />
         <option value="$PROJECT_DIR$/module12-microservices/module12-microservices-business/pom.xml" />
+        <option value="$PROJECT_DIR$/module15-clouds-lambdas/upload-lambda/pom.xml" />
+        <option value="$PROJECT_DIR$/module15-clouds-lambdas/update-lambda/pom.xml" />
       </list>
     </option>
-        <option value="$PROJECT_DIR$/module11-rest/pom.xml" />
-        <option value="$PROJECT_DIR$/module11-rest/event-service-api/pom.xml" />
-        <option value="$PROJECT_DIR$/untitled/pom.xml" />
-        <option value="$PROJECT_DIR$/module11-restapi/pom.xml" />
-        <option value="$PROJECT_DIR$/module11-rest/event-service-impl/pom.xml" />
-        <option value="$PROJECT_DIR$/module11-rest/event-service-rest/pom.xml" />
-        <option value="$PROJECT_DIR$/module11-rest/event-service-dto/pom.xml" />
-        <option value="$PROJECT_DIR$/module11-rest/module11-rest-build/pom.xml" />
-        <option value="$PROJECT_DIR$/module11-rest/module11-rest-build/event-service-api/pom.xml" />
-        <option value="$PROJECT_DIR$/module11-rest/module11-rest-build/event-service-dto/pom.xml" />
-        <option value="$PROJECT_DIR$/module11-rest/module11-rest-build/event-service-impl/pom.xml" />
-        <option value="$PROJECT_DIR$/module11-rest/module11-rest-build/event-service-rest/pom.xml" />
     <option name="ignoredFiles">
       <set>
         <option value="$PROJECT_DIR$/module11-restapi/pom.xml" />

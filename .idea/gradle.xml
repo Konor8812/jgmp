@@ -22,6 +22,7 @@
             <option value="$PROJECT_DIR$/module11-rest" />
             <option value="$PROJECT_DIR$/module12-microservices" />
             <option value="$PROJECT_DIR$/module14-clouds-rds" />
+            <option value="$PROJECT_DIR$/module15-clouds-lambdas" />
           </set>
         </option>
       </GradleProjectSettings>
