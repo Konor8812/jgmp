@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Result list</title>
+</head>
+<body>
+<th:block th:if="${entities != null}">
+  <ol>
+    <li th:each="entity : ${entities}" th:text="${entity}"></li>
+  </ol>
+</th:block>
+<th:block th:if="${entities == null}">
+  <th:block th:if="${entity == null}">
+    <p>No such entity found!</p>
+  </th:block>
+  <th:block th:if="${entity != null}">
+    <ul>
+      <li th:text="${entity}"></li>
+    </ul>
+  </th:block>
+</th:block>
+<br><br>
+<a href="/user/back"> Home</a>
+</body>
+</html>
